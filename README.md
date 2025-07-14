@@ -52,7 +52,7 @@ OPENAI_DEFAULT_MODEL=gpt-3.5-turbo
 
 ## 구조도
 ┌─────────────┐        ┌────────────────────┐
-│   React     │  <---> │    FastAPI Backend │
+│   React     │ <----> │   FastAPI Backend  │
 │ (Next.js 등)│        └────────┬───────────┘
 └─────────────┘                 │
                                 ▼
@@ -61,16 +61,21 @@ OPENAI_DEFAULT_MODEL=gpt-3.5-turbo
       │ (LLM 엔진) │ (VectorDB) │ (멀티에이전트)│
       └────────────┴────────────┴────────────┘
 
+
 TRAFIKA-1/
 ├── backend/
-│   ├── app.py
-│   ├── chatbot.py
-│   └── .env
-├── frontend/
-│   └── (React 프로젝트)
-├── requirements.txt
+│   ├── app.py             # FastAPI 진입점
+│   ├── chatbot.py         # LLM 처리 로직
+│   └── .env               # API Key 및 환경 변수
+│
+├── frontend/              # React 프론트엔드
+│   ├── src/
+│   │   ├── App.js
+│   │   └── App.css
+│   └── package.json
+│
+├── requirements.txt       # 백엔드 Python 의존성
 └── README.md
 
----
 
 > FastAPI(백엔드)와 React(프론트엔드)는 각각 별도의 터미널에서 실행해야 합니다.
