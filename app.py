@@ -1,22 +1,41 @@
-import gradio as gr
+# app.py
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from chatbot import ChatBot02
 
 bot = ChatBot02()
 
-with gr.Blocks() as demo:
-    chatbot = gr.Chatbot(label="AI 챗봇", type="messages", height=500)
-    msg = gr.Textbox(placeholder="메시지를 입력하세요.", label="메시지")
-    # btn2 = gr.Button("초기화")
+app = FastAPI()
 
-    msg.submit(bot.response, inputs=[msg, chatbot], outputs=[chatbot, msg])
+# CORS 설정
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # 또는 ["*"]
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-    save_btn = gr.Button("💾 저장")
-    load_btn = gr.Button("📂 불러오기")
-    clear_btn = gr.Button("🧹 초기화")
-    status = gr.Markdown("")
+class ChatRequest(BaseModel):
+    message: str
+    history: list  # 프론트에서 히스토리를 같이 보냄
 
-    save_btn.click(fn=bot.save_history, inputs=[chatbot], outputs=[status])
-    load_btn.click(fn=bot.load_history, inputs=[], outputs=[chatbot])
-    clear_btn.click(lambda: [], inputs=None, outputs=chatbot)
+@app.post("/chat")
+def chat(request: ChatRequest):
+    print("message:", request.message)
+    print("history:", request.history)
+    reply, updated_history = bot.response(request.message, request.history)
+    return {"response": reply, "history": updated_history}
 
-demo.launch(share=True)
+
+@app.get("/load")
+def load():
+    return {"history": bot.load_history()}
+
+@app.get("/save")
+def save():
+    history = bot.load_history()
+    status = bot.save_history(history)
+    return {"message": status}
