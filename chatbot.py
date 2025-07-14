@@ -1,13 +1,9 @@
-from dotenv import load_dotenv
-from datetime import datetime, timedelta
-from openai import OpenAI
-import gradio as gr
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import AIMessage, SystemMessage, HumanMessage
+# chatbot.py (수정 후)
 
-import time
-import json
+from dotenv import load_dotenv
+from openai import OpenAI
 import os
+import json
 
 class ChatBot02:
     def __init__(self):
@@ -17,54 +13,44 @@ class ChatBot02:
         self.client3 = OpenAI(api_key=self.apikey)
         self.SAVE_PATH = "chat_history.json"
 
-    # 대화 불러오기 함수
     def load_history(self):
         if os.path.exists(self.SAVE_PATH):
             with open(self.SAVE_PATH, "r", encoding="utf-8") as f:
                 return json.load(f)
         return []
 
-    # 대화 저장 함수
     def save_history(self, history):
         with open(self.SAVE_PATH, "w", encoding="utf-8") as f:
             json.dump(history, f, ensure_ascii=False, indent=2)
         return "✅ 대화가 저장되었습니다!"
 
-    # 응답 함수
-    def response(self, msg, history):
-        if history is None:
-            history = self.load_history()
-
-        messages = [{"role": "system", "content": """
-                        당신은 친근하고 도움이 되는 AI 어시스턴트입니다.
-                        사용자와 자연스러운 대화를 나누며, 이전 대화 내용을 기억하고
-                        맥락에 맞는 답변을 제공합니다.
-                        한국어로 대답해주세요.
-                        """}]
-
-        # Gradio가 전달한 history를 직접 사용
-        messages += history.copy()
-        messages.append({"role": "user", "content": msg})
+    def response(self, message, history):
+        messages = [
+            {
+                "role": "system",
+                "content": (
+                    "당신은 기업의 가치분석을 전문적으로 수행하는 AI 어시스턴트입니다. "
+                    "사용자가 기업의 재무정보, 시장상황, 성장성, 리스크, 경쟁사 등 다양한 정보를 입력하면, "
+                    "이를 바탕으로 기업의 내재가치, 강점과 약점, 투자 매력도 등을 분석해줍니다. "
+                    "답변은 친절하고, 이해하기 쉽게 설명하며, 필요하다면 표나 예시를 활용해 주세요."
+                )
+            }
+        ]
+        messages += history
+        messages.append({"role": "user", "content": message})
 
         result = self.client3.chat.completions.create(
             model=self.default_model,
             messages=messages,
-            stream=True,
-            max_tokens=500,
+            stream=False,
+            max_tokens=100,
         )
 
-        reply = ""
-        for chunk in result:
-            delta = chunk.choices[0].delta.content
-            if delta:
-                reply += delta
-                time.sleep(0.1)
-                # 실시간으로 답변 생성하면서 반환
-                yield history + [{"role": "user", "content": msg}, 
-                                {"role": "assistant", "content": reply}
-                                ], ""
+        reply = result.choices[0].message.content
 
-        # 마지막에 저장
-        history.append({"role": "user", "content": msg})
+        # 응답 기록 저장
+        history.append({"role": "user", "content": message})
         history.append({"role": "assistant", "content": reply})
         self.save_history(history)
+
+        return reply, history

@@ -1,0 +1,57 @@
+/* frontend/src/App.css */
+
+.App {
+  max-width: 600px;
+  margin: 30px auto;
+  font-family: sans-serif;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background: #f9f9f9;
+}
+
+.chatbox {
+  height: 400px;
+  overflow-y: scroll;
+  padding: 10px;
+  margin-bottom: 10px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.user {
+  text-align: right;
+  margin: 5px 0;
+}
+
+.bot {
+  text-align: left;
+  margin: 5px 0;
+}
+
+.input-area {
+  display: flex;
+  gap: 10px;
+}
+
+input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: gray;
+  cursor: not-allowed;
+}
