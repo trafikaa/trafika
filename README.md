@@ -50,7 +50,7 @@ OPENAI_DEFAULT_MODEL=gpt-3.5-turbo
 
 
 
-## 구조도
+<details> <summary><b>📌 아키텍처 구조도 (FastAPI + React + Ollama/RAG/A2A)</b></summary>
 ┌─────────────┐        ┌────────────────────┐
 │   React     │ <----> │   FastAPI Backend  │
 │ (Next.js 등)│        └────────┬───────────┘
@@ -60,8 +60,10 @@ OPENAI_DEFAULT_MODEL=gpt-3.5-turbo
       │   Ollama   │    RAG     │   A2A/MCP  │
       │ (LLM 엔진) │ (VectorDB) │ (멀티에이전트)│
       └────────────┴────────────┴────────────┘
+</details>
 
 
+<details> <summary><b>📁 디렉토리 구조 (TRAFIKA 프로젝트)</b></summary>
 TRAFIKA-1/
 ├── backend/
 │   ├── app.py             # FastAPI 진입점
@@ -76,6 +78,6 @@ TRAFIKA-1/
 │
 ├── requirements.txt       # 백엔드 Python 의존성
 └── README.md
-
+</details>
 
 > FastAPI(백엔드)와 React(프론트엔드)는 각각 별도의 터미널에서 실행해야 합니다.
