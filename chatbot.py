@@ -1,7 +1,7 @@
 # chatbot.py (수정 후)
 
 from dotenv import load_dotenv
-from openai import OpenAI
+# from openai import OpenAI
 import os
 import json
 
@@ -33,6 +33,7 @@ class ChatBot02:
                     "사용자가 기업의 재무정보, 시장상황, 성장성, 리스크, 경쟁사 등 다양한 정보를 입력하면, "
                     "이를 바탕으로 기업의 내재가치, 강점과 약점, 투자 매력도 등을 분석해줍니다. "
                     "답변은 친절하고, 이해하기 쉽게 설명하며, 필요하다면 표나 예시를 활용해 주세요."
+                    "답변은 한글로 작성해주세요."
                 )
             }
         ]
