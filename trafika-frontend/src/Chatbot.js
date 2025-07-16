@@ -16,10 +16,11 @@ function Chatbot() {
     setLoading(true);
     const userMsg = { role: "user", content: input };
     const newHistory = [...history, userMsg];
-    setHistory(newHistory);
 
+    const API_URL = process.env.REACT_APP_API_URL;
+    console.log("API_URL:", API_URL);
     // FastAPI /chat 엔드포인트로 POST 요청
-    const res = await fetch("http://localhost:8000/chat", {
+    const res = await fetch(`${API_URL}/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: input, history: newHistory }),
@@ -31,20 +32,22 @@ function Chatbot() {
   };
 
   const handleSave = async () => {
-    const res = await fetch("http://localhost:8000/save");
+    const API_URL = process.env.REACT_APP_API_URL;
+    const res = await fetch(`${API_URL}/save`);
     const data = await res.json();
     alert(data.message || "저장 완료!");
   };
 
   const handleLoad = async () => {
-    const res = await fetch("http://localhost:8000/load");
+    const API_URL = process.env.REACT_APP_API_URL;
+    const res = await fetch(`${API_URL}/load`);
     const data = await res.json();
     setHistory(data.history || []);
   };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-pink-100 py-6">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 flex flex-col">
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 flex flex-col h-[600px]">
         {/* 상단 */}
         <div className="flex items-center justify-center mb-4">
           <img src="/logo.png" alt="Rak-GPT" className="w-10 h-10 mr-2" />

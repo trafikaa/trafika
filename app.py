@@ -20,7 +20,7 @@ app.add_middleware(
 
 class ChatRequest(BaseModel):
     message: str
-    history: list  # 프론트에서 히스토리를 같이 보냄
+    history: list[dict]  # 프론트에서 히스토리를 같이 보냄
 
 @app.post("/chat")
 def chat(request: ChatRequest):

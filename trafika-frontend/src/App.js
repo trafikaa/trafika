@@ -19,8 +19,8 @@ function App() {
           <h1 className="text-3xl font-extrabold text-purple-700 mb-2">Rak-GPT</h1>
           {/* 안내문구 */}
           <p className="mb-8 text-gray-600 text-center">
-            Leave Your Voice Instantly<br />
-            No login required for get started chat with our AI powered chatbot.
+            당신의 가치투자를 위한 챗봇<br />
+            트라피카 입니다!
           </p>
           {/* 시작하기 버튼 */}
           <button
