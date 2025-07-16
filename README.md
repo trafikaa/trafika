@@ -10,8 +10,8 @@ AI 챗봇 애플리케이션입니다.
 ```
    - 프로젝트 루트에 `.env` 파일을 생성하고 다음 내용을 추가:
 ```
-OPENAI_API_KEY=your_openai_api_key_here
-OPENAI_DEFAULT_MODEL=gpt-3.5-turbo
+REACT_APP_OPENAI_API_KEY=your_openai_api_key_here
+REACT_APP_OPENAI_DEFAULT_MODEL=gpt-3.5-turbo
 ```
 
 1. 가상환경 활성화
