@@ -172,3 +172,15 @@ export async function fetchDartCompanyInfo(corpCode: string) {
   const data = await response.json();
   return data;
 }
+
+export async function fetchDartFinancialStatement(corpCode: string, year: string = '2023') {
+  const params = new URLSearchParams({
+    endpoint: 'fnlttSinglAcntAll.json',
+    corp_code: corpCode,
+    bsns_year: year,
+    reprt_code: '11011',
+    fs_div: 'CFS'
+  });
+  const response = await fetch(`/.netlify/functions/dartProxy?${params.toString()}`);
+  return await response.json();
+}

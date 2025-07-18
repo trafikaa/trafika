@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { CompanyData } from '../types';
 import { Calculator, Building, RefreshCw } from 'lucide-react';
 import { getCorpCodeByCompanyName } from '../services/companyService';
-import { fetchDartCompanyInfo } from '../services/dartApi';
+import { fetchDartCompanyInfo, fetchDartFinancialStatement } from '../services/dartApi';
 
 interface UnifiedFinancialFormProps {
   onSubmit: (data: CompanyData) => void;
@@ -45,8 +45,8 @@ const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({ onSubmit, c
           setLoading(false);
           return;
         }
-        const dartInfo = await fetchDartCompanyInfo(corpCode);
-        console.log('DART API 응답:', dartInfo); // 이 줄 추가!
+        const dartInfo = await fetchDartFinancialStatement(corpCode, '2023');
+        console.log('DART 재무제표 응답:', dartInfo);
         if (dartInfo && dartInfo.status === '000') {
           // dartInfo에서 필요한 필드 추출 및 자동 채움
           setFormData(prev => ({
@@ -61,7 +61,7 @@ const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({ onSubmit, c
       } catch (err) {
         setAutoFilled(false);
         setError('자동 채움 중 오류가 발생했습니다.');
-        console.error('자동 채움 에러:', err); // 이 줄 추가!
+        console.error('자동 채움 에러:', err);
       } finally {
         setLoading(false);
       }
