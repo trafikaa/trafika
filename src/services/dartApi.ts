@@ -18,10 +18,10 @@ export interface DartFinancialData {
   sj_div: string;
   sj_nm: string;
   account_id: string;
-  account_nm: string;
+  account_nm: string;      // ← 이게 "자산총계", "부채총계" 등 항목명
   account_detail: string;
   thstrm_nm: string;
-  thstrm_amount: string;
+  thstrm_amount: string;   // ← 이게 실제 금액(문자열)
   frmtrm_nm: string;
   frmtrm_amount: string;
   bfefrmtrm_nm: string;
@@ -61,7 +61,7 @@ class DartApiService {
   }
 
   // 재무제표 데이터 조회
-  async getFinancialStatement(corpCode: string, year: string = '2023'): Promise<any> {
+  async getFinancialStatement(corpCode: string, year: string = '2024'): Promise<any> {
     try {
       const params = new URLSearchParams({
         endpoint: 'fnlttSinglAcntAll.json',
@@ -134,11 +134,11 @@ class DartApiService {
   // Mock 데이터 (개발/테스트용)
   private getMockCompanyData(companyName: string): DartCompanyInfo[] {
     const mockCompanies = [
-      { corp_code: '00126380', corp_name: '삼성전자', stock_code: '005930', modify_date: '20231201' },
-      { corp_code: '00164779', corp_name: 'LG전자', stock_code: '066570', modify_date: '20231201' },
-      { corp_code: '00113570', corp_name: 'SK하이닉스', stock_code: '000660', modify_date: '20231201' },
-      { corp_code: '00401731', corp_name: '네이버', stock_code: '035420', modify_date: '20231201' },
-      { corp_code: '00164742', corp_name: '카카오', stock_code: '035720', modify_date: '20231201' }
+      { corp_code: '00126380', corp_name: '삼성전자', stock_code: '005930', modify_date: '20241201' },
+      { corp_code: '00164779', corp_name: 'LG전자', stock_code: '066570', modify_date: '20241201' },
+      { corp_code: '00113570', corp_name: 'SK하이닉스', stock_code: '000660', modify_date: '20241201' },
+      { corp_code: '00401731', corp_name: '네이버', stock_code: '035420', modify_date: '20241201' },
+      { corp_code: '00164742', corp_name: '카카오', stock_code: '035720', modify_date: '20241201' }
     ];
 
     return mockCompanies.filter(company => 
@@ -185,4 +185,25 @@ export async function fetchDartFinancialStatement(corpCode: string, year: string
   });
   const response = await fetch(`/.netlify/functions/dartProxy?${params.toString()}`);
   return await response.json();
+}
+
+function extractCompanyDataFromDart(dartInfo: { list: DartFinancialData[] }): Partial<CompanyData> {
+  const result: Partial<CompanyData> = {};
+  if (!dartInfo.list || !Array.isArray(dartInfo.list)) return result;
+
+  dartInfo.list.forEach((item) => {
+    const amount = parseInt(item.thstrm_amount.replace(/,/g, '') || '0', 10) / 100000000;
+    switch (item.account_nm) {
+      case '자산총계': result.totalAssets = amount; break;
+      case '부채총계': result.totalLiabilities = amount; break;
+      case '자본총계': result.equity = amount; break;
+      case '유동자산': result.currentAssets = amount; break;
+      case '유동부채': result.currentLiabilities = amount; break;
+      case '매출액': result.revenue = amount; break;
+      case '당기순이익': result.netIncome = amount; break;
+      case '영업활동현금흐름': result.operatingCashFlow = amount; break;
+    }
+  });
+
+  return result;
 }
