@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const DART_API_BASE_URL = 'https://opendart.fss.or.kr/api';
-const API_KEY = import.meta.env.VITE_DART_API_KEY;
+// DART API 키 관련 코드 삭제
 
 export interface DartCompanyInfo {
   corp_code: string;
@@ -31,30 +31,31 @@ export interface DartFinancialData {
 }
 
 class DartApiService {
-  private apiKey: string;
+  // DART API 키 관련 멤버 삭제
 
   constructor() {
-    this.apiKey = API_KEY || '';
-    if (!this.apiKey) {
-      console.warn('DART API key is not configured');
-    }
+    // DART API 키 관련 경고 삭제
   }
 
   // 기업 기본정보 검색
   async searchCompany(companyName: string): Promise<DartCompanyInfo[]> {
     try {
-      const response = await axios.get(`${DART_API_BASE_URL}/corpCode.xml`, {
-        params: {
-          crtfc_key: this.apiKey,
-        },
-        responseType: 'text'
+      const params = new URLSearchParams({
+        endpoint: 'company.json',
+        corp_name: companyName
       });
 
-      // XML 파싱 로직 (실제로는 더 정교한 파싱이 필요)
-      // 여기서는 Mock 데이터를 반환
-      return this.getMockCompanyData(companyName);
+      const response = await fetch(`/.netlify/functions/dartProxy?${params.toString()}`);
+      const data = await response.json();
+
+      if (data.status === '000') {
+        // 실제 데이터 파싱 로직 필요
+        return data.list;
+      } else {
+        return this.getMockCompanyData(companyName);
+      }
     } catch (error) {
-      console.error('DART API 기업 검색 오류:', error);
+      console.error('프록시 함수 기업 검색 오류:', error);
       return this.getMockCompanyData(companyName);
     }
   }
@@ -62,23 +63,24 @@ class DartApiService {
   // 재무제표 데이터 조회
   async getFinancialStatement(corpCode: string, year: string = '2023'): Promise<any> {
     try {
-      const response = await axios.get(`${DART_API_BASE_URL}/fnlttSinglAcntAll.json`, {
-        params: {
-          crtfc_key: this.apiKey,
-          corp_code: corpCode,
-          bsns_year: year,
-          reprt_code: '11011', // 사업보고서
-          fs_div: 'CFS' // 연결재무제표
-        }
+      const params = new URLSearchParams({
+        endpoint: 'fnlttSinglAcntAll.json',
+        corp_code: corpCode,
+        bsns_year: year,
+        reprt_code: '11011',
+        fs_div: 'CFS'
       });
 
-      if (response.data.status === '000') {
-        return this.parseFinancialData(response.data.list);
+      const response = await fetch(`/.netlify/functions/dartProxy?${params.toString()}`);
+      const data = await response.json();
+
+      if (data.status === '000') {
+        return this.parseFinancialData(data.list);
       } else {
         return this.getMockFinancialData();
       }
     } catch (error) {
-      console.error('DART API 재무제표 조회 오류:', error);
+      console.error('프록시 함수 재무제표 조회 오류:', error);
       return this.getMockFinancialData();
     }
   }
@@ -159,3 +161,14 @@ class DartApiService {
 }
 
 export const dartApi = new DartApiService();
+
+export async function fetchDartCompanyInfo(corpCode: string) {
+  const params = new URLSearchParams({
+    endpoint: 'company.json',
+    corp_code: corpCode
+  });
+
+  const response = await fetch(`/.netlify/functions/dartProxy?${params.toString()}`);
+  const data = await response.json();
+  return data;
+}

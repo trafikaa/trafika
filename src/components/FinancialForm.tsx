@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { CompanyData } from '../types';
 import { Calculator, Building } from 'lucide-react';
+import { getCorpCodeByCompanyName } from '../services/companyService';
+import { fetchDartCompanyInfo } from '../services/dartApi';
 
 interface FinancialFormProps {
   onSubmit: (data: CompanyData) => void;
@@ -32,6 +34,19 @@ const FinancialForm: React.FC<FinancialFormProps> = ({ onSubmit, companyName }) 
     }));
   };
 
+  async function handleSearch(companyName: string) {
+    // 1. Supabase에서 corp_code 조회
+    const corpCode = await getCorpCodeByCompanyName(companyName);
+    if (!corpCode) {
+      alert('해당 기업의 corp_code를 찾을 수 없습니다.');
+      return;
+    }
+    // 2. DART API에서 기업 정보 조회
+    const dartInfo = await fetchDartCompanyInfo(corpCode);
+    console.log('DART API 결과:', dartInfo);
+    // 3. 필요하다면 상태로 저장해서 화면에 표시
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6 max-w-md mx-auto">
       <div className="flex items-center gap-2 mb-6">
@@ -41,16 +56,14 @@ const FinancialForm: React.FC<FinancialFormProps> = ({ onSubmit, companyName }) 
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            기업명
-          </label>
+          <label htmlFor="companyName">기업명</label>
           <input
+            id="companyName"
             type="text"
-            value={formData.name}
+            name="companyName"
+            value={companyName}
             onChange={(e) => handleInputChange('name', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="기업명을 입력하세요"
-            required
           />
         </div>
 
