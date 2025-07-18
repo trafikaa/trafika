@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { CompanyData } from '../types';
 import { Calculator, Building, RefreshCw } from 'lucide-react';
 import { getCorpCodeByCompanyName } from '../services/companyService';
-import { fetchDartCompanyInfo, fetchDartFinancialStatement } from '../services/dartApi';
+import { fetchDartFinancialStatement } from '../services/dartApi';
+import { DART_DEFAULT_YEAR } from '../constants/finance';
 
 interface UnifiedFinancialFormProps {
   onSubmit: (data: CompanyData) => void;
@@ -45,7 +46,7 @@ const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({ onSubmit, c
           setLoading(false);
           return;
         }
-        const dartInfo = await fetchDartFinancialStatement(corpCode, '2023');
+        const dartInfo = await fetchDartFinancialStatement(corpCode, DART_DEFAULT_YEAR);
         console.log('DART 재무제표 응답:', dartInfo);
         if (dartInfo && dartInfo.status === '000') {
           // dartInfo에서 필요한 필드 추출 및 자동 채움

@@ -173,7 +173,9 @@ export async function fetchDartCompanyInfo(corpCode: string) {
   return data;
 }
 
-export async function fetchDartFinancialStatement(corpCode: string, year: string = '2023') {
+import { DART_DEFAULT_YEAR } from '../constants/finance';
+
+export async function fetchDartFinancialStatement(corpCode: string, year: string = DART_DEFAULT_YEAR) {
   const params = new URLSearchParams({
     endpoint: 'fnlttSinglAcntAll.json',
     corp_code: corpCode,

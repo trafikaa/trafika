@@ -1,3 +1,5 @@
+// 기업의 기본정보(대표자, 주소 등)를 조회하는 서비스
+
 import { supabase } from '../lib/supabase';
 
 export async function getCorpCodeByCompanyName(companyName: string): Promise<string | null> {
