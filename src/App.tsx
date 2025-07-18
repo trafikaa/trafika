@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Bot, TrendingDown, RefreshCw, Database } from 'lucide-react';
 import EnhancedChatMessage from './components/EnhancedChatMessage';
-import EnhancedFinancialForm from './components/EnhancedFinancialForm';
+import UnifiedFinancialForm from './components/UnifiedFinancialForm';
 import TypingIndicator from './components/TypingIndicator';
 import { useEnhancedChat } from './hooks/useEnhancedChat';
 
@@ -101,7 +101,7 @@ function App() {
 
             {currentStep === 'financial-data' && (
               <div className="flex justify-center">
-                <EnhancedFinancialForm 
+                <UnifiedFinancialForm 
                   onSubmit={handleFinancialDataSubmit}
                   companyName={companyName}
                   initialData={companyData}
