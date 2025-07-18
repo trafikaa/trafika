@@ -4,12 +4,16 @@ export async function getCorpCodeByCompanyName(companyName: string): Promise<str
   const { data, error } = await supabase
     .from('ticker_info')
     .select('corp_code')
-    .eq('corp_name', companyName)
-    .single();
+    .ilike('corp_name', `%${companyName.trim()}%`)
+    .maybeSingle();
 
   if (error) {
     console.error('Supabase 쿼리 오류:', error);
     return null;
   }
-  return data?.corp_code ?? null;
+  if (!data) {
+    console.warn('DB에 해당 기업명이 없습니다:', companyName);
+    return null;
+  }
+  return data.corp_code;
 }

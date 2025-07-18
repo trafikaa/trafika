@@ -15,6 +15,10 @@ export const supabase = isSupabaseConfigured
 
 export { isSupabaseConfigured };
 
+console.log('supabaseUrl:', supabaseUrl);
+console.log('supabaseAnonKey:', supabaseAnonKey);
+console.log('isSupabaseConfigured:', isSupabaseConfigured);
+
 export interface CompanyRiskData {
   id?: string;
   company_name: string;
