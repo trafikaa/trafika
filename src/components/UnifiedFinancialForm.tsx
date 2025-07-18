@@ -109,7 +109,7 @@ const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({ onSubmit, c
       {autoFilled && (
         <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
           <p className="text-sm text-green-700">
-            ✅ DART에서 자동으로 불러온 데이터입니다. 필요시 수정 후 분석을 진행하세요.
+            ✅ {formData.name}의 재무정보를 성공적으로 불러왔습니다! ({DART_DEFAULT_YEAR}년)
           </p>
         </div>
       )}
