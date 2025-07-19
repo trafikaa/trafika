@@ -1,23 +1,9 @@
-import { createClient } from '@supabase/supabase-js';
+// 클라이언트 사이드 Supabase 제거 - API 키 노출 방지
+export const supabase = null;
+export const isSupabaseConfigured = false;
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_DATABASE_URL; // 변수명 변경!
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-// Check if Supabase is properly configured
-const isSupabaseConfigured = supabaseUrl && supabaseAnonKey && 
-  supabaseUrl !== 'https://your-project-id.supabase.co' && 
-  supabaseAnonKey !== 'your-anon-key-here';
-
-// Only create client if properly configured, otherwise use null
-export const supabase = isSupabaseConfigured 
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : null;
-
-export { isSupabaseConfigured };
-
-console.log('supabaseUrl:', supabaseUrl);
-console.log('supabaseAnonKey:', supabaseAnonKey);
-console.log('isSupabaseConfigured:', isSupabaseConfigured);
+// 디버그 로그 제거
+// console.log 제거
 
 export interface CompanyRiskData {
   id?: string;
