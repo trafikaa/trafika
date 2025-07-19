@@ -18,20 +18,27 @@ exports.handler = async function(event, context) {
   }
 
   try {
-    // Netlify 환경변수 이름으로 수정
-    const supabaseUrl = process.env.VITE_SUPABASE_DATABASE_URL;
-    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
+    console.log('=== Supabase 프록시 시작 ===');
+    console.log('요청 메서드:', event.httpMethod);
+    console.log('요청 바디:', event.body);
+    
+    // Netlify 환경변수 이름으로 수정 - Service Role Key 사용
+    const supabaseUrl = process.env.VITE_SUPABASE_DATABASE_URL || process.env.SUPABASE_DATABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     console.log('환경변수 확인:', {
       hasUrl: !!supabaseUrl,
-      hasKey: !!supabaseAnonKey
+      hasKey: !!supabaseServiceKey,
+      urlLength: supabaseUrl ? supabaseUrl.length : 0,
+      keyLength: supabaseServiceKey ? supabaseServiceKey.length : 0,
+      allEnvVars: Object.keys(process.env).filter(key => key.includes('SUPABASE'))
     });
 
-    if (!supabaseUrl || !supabaseAnonKey) {
+    if (!supabaseUrl || !supabaseServiceKey) {
       throw new Error('Supabase 환경변수가 설정되지 않았습니다.');
     }
 
-    const supabase = createClient(supabaseUrl, supabaseAnonKey);
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const { action, table, data, query } = JSON.parse(event.body || '{}');
 
     console.log('요청 정보:', { action, table, data, query });
@@ -78,12 +85,11 @@ exports.handler = async function(event, context) {
             }
           });
           
-          result = await queryBuilder.order('created_at', { ascending: false });
+          result = await queryBuilder;
         } else {
           result = await supabase
             .from(table)
-            .select('*')
-            .order('created_at', { ascending: false });
+            .select('*');
         }
         break;
 

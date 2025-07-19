@@ -3,13 +3,14 @@ import { ChatMessage, ChatStep, CompanyData } from '../types';
 import { calculateFinancialRatios, assessRisk } from '../utils/financialAnalysis';
 import { dartApi } from '../services/dartApi';
 import { riskDatabase } from '../services/riskDatabase';
+import { getCorpCodeByCompanyName } from '../services/companyService';
 
 export const useEnhancedChat = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
       type: 'bot',
-      content: '안녕하세요! 고도화된 부실기업 경고 시스템입니다. 🏢\n\n기업명을 입력하시면 다트(DART)에서 최신 재무정보를 자동으로 불러와 분석해드립니다.\n\n분석하고 싶은 기업명을 입력해주세요.',
+      content: '안녕하세요! 고도화된 부실기업 경고 시스템입니다. 🏢\n\n기업명을 입력하시면 데이터베이스에서 기업 코드를 찾고, 다트(DART)에서 최신 재무정보를 자동으로 불러와 분석해드립니다.\n\n분석하고 싶은 기업명을 입력해주세요.',
       timestamp: new Date(),
     }
   ]);
@@ -48,36 +49,43 @@ export const useEnhancedChat = () => {
 
     simulateTyping(async () => {
       try {
-        // 1. 다트에서 기업 정보 검색
+        // 1. Supabase에서 기업 코드 검색
         addMessage({
           type: 'bot',
-          content: `${name} 기업을 다트(DART)에서 검색 중입니다... 🔍`,
+          content: `${name} 기업을 데이터베이스에서 검색 중입니다... 🔍`,
         });
 
-        const companies = await dartApi.searchCompany(name);
+        const corpCode = await getCorpCodeByCompanyName(name);
         
-        if (companies.length === 0) {
+        if (!corpCode) {
           addMessage({
             type: 'bot',
-            content: `죄송합니다. "${name}" 기업을 찾을 수 없습니다.\n\n다른 기업명으로 다시 시도해주세요.`,
+            content: `죄송합니다. "${name}" 기업을 데이터베이스에서 찾을 수 없습니다.\n\n다른 기업명으로 다시 시도해주세요.`,
           });
           setIsLoading(false);
           return;
         }
 
-        const selectedCompany = companies[0];
-        
         simulateTyping(async () => {
-          // 2. 재무제표 데이터 조회
+          // 2. DART API에서 재무제표 데이터 조회
           addMessage({
             type: 'bot',
-            content: `${selectedCompany.corp_name}의 최신 재무정보를 불러오는 중입니다... 📊`,
+            content: `${name}의 최신 재무정보를 다트(DART)에서 불러오는 중입니다... 📊`,
           });
 
-          const financialData = await dartApi.getFinancialStatement(selectedCompany.corp_code);
+          const financialData = await dartApi.getFinancialStatement(corpCode);
           
+          if (!financialData) {
+            addMessage({
+              type: 'bot',
+              content: `죄송합니다. "${name}" 기업의 재무정보를 불러올 수 없습니다.\n\n다른 기업명으로 다시 시도해주세요.`,
+            });
+            setIsLoading(false);
+            return;
+          }
+
           const fullCompanyData: CompanyData = {
-            name: selectedCompany.corp_name,
+            name: name,
             ...financialData
           };
 
@@ -87,7 +95,7 @@ export const useEnhancedChat = () => {
           simulateTyping(() => {
             addMessage({
               type: 'bot',
-              content: `✅ ${selectedCompany.corp_name}의 재무정보를 성공적으로 불러왔습니다!\n\n아래에서 데이터를 확인하고 필요시 수정한 후 분석을 진행해주세요.`,
+              content: `✅ ${name}의 재무정보를 성공적으로 불러왔습니다!\n\n아래에서 데이터를 확인하고 필요시 수정한 후 분석을 진행해주세요.`,
             });
             setIsLoading(false);
           }, 1000);
@@ -193,7 +201,7 @@ export const useEnhancedChat = () => {
       {
         id: '1',
         type: 'bot',
-        content: '안녕하세요! 고도화된 부실기업 경고 시스템입니다. 🏢\n\n기업명을 입력하시면 다트(DART)에서 최신 재무정보를 자동으로 불러와 분석해드립니다.\n\n분석하고 싶은 기업명을 입력해주세요.',
+        content: '안녕하세요! 고도화된 부실기업 경고 시스템입니다. 🏢\n\n기업명을 입력하시면 데이터베이스에서 기업 코드를 찾고, 다트(DART)에서 최신 재무정보를 자동으로 불러와 분석해드립니다.\n\n분석하고 싶은 기업명을 입력해주세요.',
         timestamp: new Date(),
       }
     ]);

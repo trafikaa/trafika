@@ -2,7 +2,6 @@ import axios from 'axios';
 import { DART_DEFAULT_YEAR } from '../constants/finance';
 
 const DART_API_BASE_URL = 'https://opendart.fss.or.kr/api';
-// DART API 키 관련 코드 삭제
 
 export interface DartCompanyInfo {
   corp_code: string;
@@ -45,10 +44,8 @@ export interface CompanyData {
 }
 
 class DartApiService {
-  // DART API 키 관련 멤버 삭제
-
   constructor() {
-    // DART API 키 관련 경고 삭제
+    // 생성자에서 특별한 초기화 작업 없음
   }
 
   // 기업 기본정보 검색
@@ -63,14 +60,14 @@ class DartApiService {
       const data = await response.json();
 
       if (data.status === '000') {
-        // 실제 데이터 파싱 로직 필요
-        return data.list;
+        return data.list || [];
       } else {
-        return this.getMockCompanyData(companyName);
+        console.error('DART API 검색 실패:', data.message);
+        return [];
       }
     } catch (error) {
       console.error('프록시 함수 기업 검색 오류:', error);
-      return this.getMockCompanyData(companyName);
+      return [];
     }
   }
 
@@ -91,11 +88,12 @@ class DartApiService {
       if (data.status === '000') {
         return this.parseFinancialData(data.list);
       } else {
-        return this.getMockFinancialData();
+        console.error('DART API 재무제표 조회 실패:', data.message);
+        return null;
       }
     } catch (error) {
       console.error('프록시 함수 재무제표 조회 오류:', error);
-      return this.getMockFinancialData();
+      return null;
     }
   }
 
@@ -110,6 +108,10 @@ class DartApiService {
       netIncome: 0,
       operatingCashFlow: 0
     };
+
+    if (!rawData || !Array.isArray(rawData)) {
+      return financialData;
+    }
 
     rawData.forEach(item => {
       const amount = parseInt(item.thstrm_amount.replace(/,/g, '')) || 0;
@@ -143,34 +145,6 @@ class DartApiService {
     });
 
     return financialData;
-  }
-
-  // Mock 데이터 (개발/테스트용)
-  private getMockCompanyData(companyName: string): DartCompanyInfo[] {
-    const mockCompanies = [
-      { corp_code: '00126380', corp_name: '삼성전자', stock_code: '005930', modify_date: '20241201' },
-      { corp_code: '00164779', corp_name: 'LG전자', stock_code: '066570', modify_date: '20241201' },
-      { corp_code: '00113570', corp_name: 'SK하이닉스', stock_code: '000660', modify_date: '20241201' },
-      { corp_code: '00401731', corp_name: '네이버', stock_code: '035420', modify_date: '20241201' },
-      { corp_code: '00164742', corp_name: '카카오', stock_code: '035720', modify_date: '20241201' }
-    ];
-
-    return mockCompanies.filter(company => 
-      company.corp_name.includes(companyName) || companyName.includes(company.corp_name)
-    );
-  }
-
-  private getMockFinancialData(): any {
-    return {
-      totalAssets: 4278,
-      totalLiabilities: 1047,
-      equity: 3231,
-      currentAssets: 1876,
-      currentLiabilities: 623,
-      revenue: 3020,
-      netIncome: 265,
-      operatingCashFlow: 412
-    };
   }
 }
 
