@@ -8,6 +8,7 @@ import { DART_DEFAULT_YEAR } from '../constants/finance';
 interface UnifiedFinancialFormProps {
   onSubmit: (data: CompanyData) => void;
   companyName?: string;
+  initialData?: CompanyData | null; // 추가된 prop
 }
 
 const defaultForm: Partial<CompanyData> = {
@@ -22,11 +23,29 @@ const defaultForm: Partial<CompanyData> = {
   operatingCashFlow: 0,
 };
 
-const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({ onSubmit, companyName = '' }) => {
-  const [formData, setFormData] = useState<Partial<CompanyData>>({ ...defaultForm, name: companyName });
+const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({ 
+  onSubmit, 
+  companyName = '',
+  initialData = null 
+}) => {
+  const [formData, setFormData] = useState<Partial<CompanyData>>({ 
+    ...defaultForm, 
+    name: companyName,
+    ...(initialData || {}) // initialData가 있으면 사용
+  });
   const [autoFilled, setAutoFilled] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // initialData가 변경되면 formData 업데이트
+  useEffect(() => {
+    if (initialData) {
+      setFormData(prev => ({
+        ...prev,
+        ...initialData
+      }));
+    }
+  }, [initialData]);
 
   // 기업명 입력 시 자동으로 corp_code 조회 및 DART API 자동 채움
   useEffect(() => {

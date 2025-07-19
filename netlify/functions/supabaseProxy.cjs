@@ -18,16 +18,23 @@ exports.handler = async function(event, context) {
   }
 
   try {
-    // 서버 사이드에서만 환경변수 접근
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    // Netlify 환경변수 이름으로 수정
+    const supabaseUrl = process.env.VITE_SUPABASE_DATABASE_URL;
+    const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY;
 
-    if (!supabaseUrl || !supabaseServiceKey) {
+    console.log('환경변수 확인:', {
+      hasUrl: !!supabaseUrl,
+      hasKey: !!supabaseAnonKey
+    });
+
+    if (!supabaseUrl || !supabaseAnonKey) {
       throw new Error('Supabase 환경변수가 설정되지 않았습니다.');
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
     const { action, table, data, query } = JSON.parse(event.body || '{}');
+
+    console.log('요청 정보:', { action, table, data, query });
 
     let result;
 
@@ -40,9 +47,44 @@ exports.handler = async function(event, context) {
         break;
 
       case 'select':
-        result = await supabase
-          .from(table)
-          .select(query || '*');
+        if (query && typeof query === 'object') {
+          let queryBuilder = supabase.from(table).select('*');
+          
+          // 각 쿼리 조건 처리
+          Object.keys(query).forEach(key => {
+            const value = query[key];
+            
+            if (typeof value === 'string') {
+              // LIKE 쿼리 처리 (%로 시작하거나 끝나는 경우)
+              if (value.startsWith('%') && value.endsWith('%')) {
+                // 양쪽에 %가 있는 경우
+                const searchTerm = value.slice(1, -1);
+                queryBuilder = queryBuilder.ilike(key, `%${searchTerm}%`);
+              } else if (value.startsWith('%')) {
+                // 앞에 %가 있는 경우
+                const searchTerm = value.slice(1);
+                queryBuilder = queryBuilder.ilike(key, `%${searchTerm}`);
+              } else if (value.endsWith('%')) {
+                // 뒤에 %가 있는 경우
+                const searchTerm = value.slice(0, -1);
+                queryBuilder = queryBuilder.ilike(key, `${searchTerm}%`);
+              } else {
+                // 정확한 매칭
+                queryBuilder = queryBuilder.eq(key, value);
+              }
+            } else {
+              // 숫자나 다른 타입
+              queryBuilder = queryBuilder.eq(key, value);
+            }
+          });
+          
+          result = await queryBuilder.order('created_at', { ascending: false });
+        } else {
+          result = await supabase
+            .from(table)
+            .select('*')
+            .order('created_at', { ascending: false });
+        }
         break;
 
       case 'update':
@@ -63,6 +105,8 @@ exports.handler = async function(event, context) {
       default:
         throw new Error('지원하지 않는 액션입니다.');
     }
+
+    console.log('쿼리 결과:', result);
 
     return {
       statusCode: 200,

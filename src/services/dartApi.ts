@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { DART_DEFAULT_YEAR } from '../constants/finance';
 
 const DART_API_BASE_URL = 'https://opendart.fss.or.kr/api';
 // DART API 키 관련 코드 삭제
@@ -28,6 +29,19 @@ export interface DartFinancialData {
   bfefrmtrm_amount: string;
   ord: string;
   currency: string;
+}
+
+// CompanyData 타입 정의 추가
+export interface CompanyData {
+  name: string;
+  totalAssets: number;
+  totalLiabilities: number;
+  equity: number;
+  currentAssets: number;
+  currentLiabilities: number;
+  revenue: number;
+  netIncome: number;
+  operatingCashFlow: number;
 }
 
 class DartApiService {
@@ -172,8 +186,6 @@ export async function fetchDartCompanyInfo(corpCode: string) {
   const data = await response.json();
   return data;
 }
-
-import { DART_DEFAULT_YEAR } from '../constants/finance';
 
 export async function fetchDartFinancialStatement(corpCode: string, year: string = DART_DEFAULT_YEAR) {
   const params = new URLSearchParams({
