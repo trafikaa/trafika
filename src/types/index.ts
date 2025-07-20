@@ -11,12 +11,12 @@ export interface CompanyData {
 }
 
 export interface FinancialRatios {
-  debtRatio: number;
-  currentRatio: number;
-  equityRatio: number;
-  roa: number;
-  roe: number;
-  operatingMargin: number;
+  debt_ratio: number | null;
+  current_ratio: number | null;
+  equity_ratio: number | null;
+  pretax_income_to_total_assets: number | null; // ROA
+  roe: number | null;
+  operating_margin_on_total_assets: number | null; // 영업이익률
 }
 
 export interface RiskAssessment {
@@ -26,12 +26,19 @@ export interface RiskAssessment {
   recommendations: string[];
 }
 
-export interface ChatMessage {
-  id: string;
-  type: 'user' | 'bot';
-  content: string;
-  timestamp: Date;
-  data?: any;
+export interface ChatMessageData {
+  ratios?: FinancialRatios;
+  riskLevel?: 'safe' | 'caution' | 'danger';
+  riskScore?: number;
+  companyData?: CompanyData;
 }
 
-export type ChatStep = 'welcome' | 'company-name' | 'financial-data' | 'analysis' | 'complete';
+export interface ChatMessage {
+  id: string;
+  type: 'user' | 'bot'; 
+  content: string;
+  timestamp: Date;
+  data?: ChatMessageData; 
+}
+
+export type ChatStep = 'welcome' | 'company-name' | 'financial-data' | 'analysis' | 'complete' | 'chat';

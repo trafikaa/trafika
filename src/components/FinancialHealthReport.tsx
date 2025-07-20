@@ -8,7 +8,9 @@ interface FinancialHealthReportProps {
 }
 
 const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, data }) => {
-  const getHealthScore = (value: number, thresholds: { good: number; fair: number }, isHigherBetter: boolean = true) => {
+  const getHealthScore = (value: number | null, thresholds: { good: number; fair: number }, isHigherBetter: boolean = true) => {
+    if (value === null) return { score: 'unknown', color: 'text-gray-600', bg: 'bg-gray-50' };
+    
     if (isHigherBetter) {
       if (value >= thresholds.good) return { score: 'good', color: 'text-green-600', bg: 'bg-green-50' };
       if (value >= thresholds.fair) return { score: 'fair', color: 'text-yellow-600', bg: 'bg-yellow-50' };
@@ -32,37 +34,37 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
   const healthMetrics = [
     {
       title: '부채비율',
-      value: ratios.debtRatio,
+      value: ratios.debt_ratio,
       unit: '%',
       description: '총부채 / 총자산',
-      health: getHealthScore(ratios.debtRatio, { good: 30, fair: 50 }, false),
+      health: getHealthScore(ratios.debt_ratio, { good: 30, fair: 50 }, false),
       icon: <Shield className="w-5 h-5" />,
       benchmark: '30% 이하 우수, 50% 이하 양호'
     },
     {
       title: '유동비율',
-      value: ratios.currentRatio,
+      value: ratios.current_ratio,
       unit: '',
       description: '유동자산 / 유동부채',
-      health: getHealthScore(ratios.currentRatio, { good: 2.0, fair: 1.5 }),
+      health: getHealthScore(ratios.current_ratio, { good: 2.0, fair: 1.5 }),
       icon: <DollarSign className="w-5 h-5" />,
       benchmark: '2.0 이상 우수, 1.5 이상 양호'
     },
     {
       title: '자기자본비율',
-      value: ratios.equityRatio,
+      value: ratios.equity_ratio,
       unit: '%',
       description: '자기자본 / 총자산',
-      health: getHealthScore(ratios.equityRatio, { good: 50, fair: 30 }),
+      health: getHealthScore(ratios.equity_ratio, { good: 50, fair: 30 }),
       icon: <TrendingUp className="w-5 h-5" />,
       benchmark: '50% 이상 우수, 30% 이상 양호'
     },
     {
       title: '총자산수익률(ROA)',
-      value: ratios.roa,
+      value: ratios.pretax_income_to_total_assets,
       unit: '%',
       description: '순이익 / 총자산',
-      health: getHealthScore(ratios.roa, { good: 5, fair: 2 }),
+      health: getHealthScore(ratios.pretax_income_to_total_assets, { good: 5, fair: 2 }),
       icon: <TrendingUp className="w-5 h-5" />,
       benchmark: '5% 이상 우수, 2% 이상 양호'
     },
@@ -77,10 +79,10 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
     },
     {
       title: '영업이익률',
-      value: ratios.operatingMargin,
+      value: ratios.operating_margin_on_total_assets,
       unit: '%',
-      description: '순이익 / 매출액',
-      health: getHealthScore(ratios.operatingMargin, { good: 10, fair: 5 }),
+      description: '영업이익 / 총자산',
+      health: getHealthScore(ratios.operating_margin_on_total_assets, { good: 10, fair: 5 }),
       icon: <DollarSign className="w-5 h-5" />,
       benchmark: '10% 이상 우수, 5% 이상 양호'
     }
@@ -134,7 +136,7 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
             
             <h4 className="font-semibold text-gray-800 mb-1">{metric.title}</h4>
             <div className="text-2xl font-bold mb-1" style={{ color: metric.health.color.replace('text-', '') }}>
-              {metric.value.toFixed(2)}{metric.unit}
+              {metric.value !== null ? `${metric.value.toFixed(2)}${metric.unit}` : 'N/A'}
             </div>
             
             <p className="text-xs text-gray-600 mb-2">{metric.description}</p>
@@ -170,10 +172,10 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
       <div className="mt-6 p-4 bg-blue-50 rounded-lg">
         <h4 className="font-semibold text-blue-800 mb-2">💡 재무건전성 개선 권장사항</h4>
         <ul className="text-sm text-blue-700 space-y-1">
-          {ratios.debtRatio > 50 && <li>• 부채비율 개선을 위한 부채 축소 및 자기자본 확충 필요</li>}
-          {ratios.currentRatio < 1.5 && <li>• 단기 유동성 개선을 위한 유동자산 증대 권장</li>}
-          {ratios.roa < 2 && <li>• 자산 효율성 제고를 통한 수익성 개선 필요</li>}
-          {ratios.roe < 10 && <li>• 자기자본 수익률 향상을 위한 사업 효율성 개선 권장</li>}
+          {ratios.debt_ratio && ratios.debt_ratio > 50 && <li>• 부채비율 개선을 위한 부채 축소 및 자기자본 확충 필요</li>}
+          {ratios.current_ratio && ratios.current_ratio < 1.5 && <li>• 단기 유동성 개선을 위한 유동자산 증대 권장</li>}
+          {ratios.pretax_income_to_total_assets && ratios.pretax_income_to_total_assets < 2 && <li>• 자산 효율성 제고를 통한 수익성 개선 필요</li>}
+          {ratios.roe && ratios.roe < 10 && <li>• 자기자본 수익률 향상을 위한 사업 효율성 개선 권장</li>}
           {data.operatingCashFlow < 0 && <li>• 영업현금흐름 개선을 위한 운영 효율성 제고 필요</li>}
         </ul>
       </div>

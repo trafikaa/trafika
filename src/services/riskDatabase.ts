@@ -1,3 +1,7 @@
+// 현재 사용하지 않는 데이터베이스 저장 기능
+// 필요시 주석 해제하여 사용
+
+/*
 import { supabaseProxy } from './supabaseProxy';
 import { CompanyRiskData } from '../lib/supabase';
 
@@ -68,3 +72,4 @@ export const riskDatabase = {
     }
   }
 };
+*/

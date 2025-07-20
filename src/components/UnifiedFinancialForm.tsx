@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CompanyData } from '../types';
 import { Calculator, Building, RefreshCw } from 'lucide-react';
-import { getCorpCodeByCompanyName } from '../services/companyService';
+import { getCompanyInfoByName } from '../services/companyService';
 import { fetchDartFinancialStatement } from '../services/dartApi';
 import { DART_DEFAULT_YEAR } from '../constants/finance';
 
@@ -57,15 +57,15 @@ const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({
       setLoading(true);
       setError(null);
       try {
-        const corpCode = await getCorpCodeByCompanyName(formData.name.trim());
-        console.log('Supabase corpCode:', corpCode);
-        if (!corpCode) {
+        const companyInfo = await getCompanyInfoByName(formData.name.trim());
+        console.log('Supabase companyInfo:', companyInfo);
+        if (!companyInfo) {
           setAutoFilled(false);
-          setError('해당 기업의 corp_code를 찾을 수 없습니다.');
+          setError('해당 기업의 정보를 찾을 수 없습니다.');
           setLoading(false);
           return;
         }
-        const dartInfo = await fetchDartFinancialStatement(corpCode, DART_DEFAULT_YEAR);
+        const dartInfo = await fetchDartFinancialStatement(companyInfo.corp_code, DART_DEFAULT_YEAR);
         console.log('DART 재무제표 응답:', dartInfo);
         if (dartInfo && dartInfo.status === '000') {
           // dartInfo에서 필요한 필드 추출 및 자동 채움

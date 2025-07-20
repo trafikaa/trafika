@@ -15,16 +15,21 @@ function App() {
     isLoading,
     handleCompanyNameSubmit,
     handleFinancialDataSubmit,
+    handleGeneralChat,
     resetChat,
   } = useEnhancedChat();
 
-  const [companyNameInput, setCompanyNameInput] = useState('');
+  const [userInput, setUserInput] = useState('');
 
-  const handleCompanyNameFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (companyNameInput.trim() && !isLoading) {
-      handleCompanyNameSubmit(companyNameInput.trim());
-      setCompanyNameInput('');
+    if (userInput.trim() && !isLoading) {
+      if (currentStep === 'company-name') {
+        handleCompanyNameSubmit(userInput.trim());
+      } else {
+        handleGeneralChat(userInput.trim());
+      }
+      setUserInput('');
     }
   };
 
@@ -40,7 +45,7 @@ function App() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-800">고도화된 부실기업 경고 시스템</h1>
-                <p className="text-sm text-gray-600">DART API 연동 • AI 기반 재무 위험 분석 • Fear & Greed Index</p>
+                <p className="text-sm text-gray-600">DART API 연동 • AI 기반 재무 위험 분석 • ChatGPT 연동</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -80,21 +85,21 @@ function App() {
           {/* Input Section */}
           <div className="border-t border-gray-200 p-4">
             {currentStep === 'company-name' && (
-              <form onSubmit={handleCompanyNameFormSubmit} className="flex gap-2">
+              <form onSubmit={handleFormSubmit} className="flex gap-2">
                 <input
                   type="text"
-                  value={companyNameInput}
-                  onChange={(e) => setCompanyNameInput(e.target.value)}
-                  placeholder="기업명을 입력하세요 (예: 삼성전자, LG전자, SK하이닉스)"
+                  value={userInput}
+                  onChange={(e) => setUserInput(e.target.value)}
+                  placeholder="기업명을 입력하거나 궁금한 질문을 해주세요 (예: 삼성전자, 재무제표란?, 투자 조언)"
                   className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   disabled={isLoading}
                 />
                 <button
                   type="submit"
-                  disabled={!companyNameInput.trim() || isLoading}
+                  disabled={!userInput.trim() || isLoading}
                   className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
                 >
-                  {isLoading ? '검색 중...' : '분석 시작'}
+                  {isLoading ? '처리 중...' : '전송'}
                 </button>
               </form>
             )}
@@ -110,13 +115,34 @@ function App() {
             )}
 
             {currentStep === 'complete' && (
-              <div className="text-center">
-                <button
-                  onClick={resetChat}
-                  className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-200 font-medium"
-                >
-                  새로운 기업 분석하기
-                </button>
+              <div className="space-y-4">
+                <div className="text-center">
+                  <button
+                    onClick={resetChat}
+                    className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg hover:from-green-700 hover:to-emerald-700 transition-all duration-200 font-medium"
+                  >
+                    새로운 기업 분석하기
+                  </button>
+                </div>
+                
+                {/* 추가 질문 입력 필드 */}
+                <form onSubmit={handleFormSubmit} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={userInput}
+                    onChange={(e) => setUserInput(e.target.value)}
+                    placeholder="추가 질문이 있으시면 언제든지 물어보세요!"
+                    className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    disabled={isLoading}
+                  />
+                  <button
+                    type="submit"
+                    disabled={!userInput.trim() || isLoading}
+                    className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    {isLoading ? '처리 중...' : '질문'}
+                  </button>
+                </form>
               </div>
             )}
           </div>
@@ -136,7 +162,7 @@ function App() {
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                <span>Fear & Greed Index</span>
+                <span>ChatGPT 연동</span>
               </div>
               <div className="flex items-center gap-1">
                 <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
