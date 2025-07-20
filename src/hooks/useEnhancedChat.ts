@@ -209,7 +209,6 @@ export const useEnhancedChat = () => {
           content: `${data.name}의 재무비율 데이터를 데이터베이스에서 조회 중입니다... 📊`,
         });
 
-        console.log('재무비율 조회 시작 - ticker:', currentCompanyInfo.ticker);
         const ratios = await getFinancialRatiosByTicker(currentCompanyInfo.ticker);
         
         if (!ratios) {
@@ -221,60 +220,10 @@ export const useEnhancedChat = () => {
           return;
         }
 
-        console.log('가져온 재무비율 데이터:', ratios);
-        console.log('재무비율 데이터 타입 확인:', {
-          debt_ratio: typeof ratios.debt_ratio,
-          current_ratio: typeof ratios.current_ratio,
-          equity_ratio: typeof ratios.equity_ratio,
-          pretax_income_to_total_assets: typeof ratios.pretax_income_to_total_assets,
-          roe: typeof ratios.roe,
-          operating_margin_on_total_assets: typeof ratios.operating_margin_on_total_assets
-        });
-
         // 2. 위험도 평가 (기존 로직 사용)
-        console.log('위험도 평가 시작...');
         const riskAssessment = assessRisk(ratios, data);
-        console.log('위험도 평가 결과:', riskAssessment);
         
         // 3. 데이터베이스 저장 부분 제거 - 분석 결과만 표시
-        console.log('분석 완료 - 결과 표시 시작');
-
-        let riskMessage = '';
-        let riskEmoji = '';
-        
-        // switch (riskAssessment.level) {
-        //   case 'danger':
-        //     riskMessage = '🚨 위험 등급: 높음\n즉시 개선 조치가 필요합니다!';
-        //     riskEmoji = '🚨';
-        //     break;
-        //   case 'caution':
-        //     riskMessage = '⚠️ 위험 등급: 보통\n지속적인 모니터링이 필요합니다.';
-        //     riskEmoji = '⚠️';
-        //     break;
-        //   case 'safe':
-        //     riskMessage = '✅ 위험 등급: 낮음\n양호한 재무상태입니다.';
-        //     riskEmoji = '✅';
-        //     break;
-        // }
-
-        // let content = `${data.name} 기업 분석 완료 ${riskEmoji}\n\n${riskMessage}\n\n`;
-        
-        // if (riskAssessment.warnings.length > 0) {
-        //   content += '⚠️ 주요 경고사항:\n';
-        //   riskAssessment.warnings.forEach((warning, index) => {
-        //     content += `${index + 1}. ${warning}\n`;
-        //   });
-        //   content += '\n';
-        // }
-
-        // if (riskAssessment.recommendations.length > 0) {
-        //   content += '💡 개선 권장사항:\n';
-        //   riskAssessment.recommendations.forEach((recommendation, index) => {
-        //     content += `${index + 1}. ${recommendation}\n`;
-        //   });
-        // }
-
-        // console.log('분석 완료 메시지 생성:', content);
 
         addMessage({
           type: 'bot',
@@ -290,8 +239,7 @@ export const useEnhancedChat = () => {
         setCurrentStep('complete');
         setIsLoading(false);
       } catch (error) {
-        console.error('분석 오류 상세:', error);
-        console.error('오류 스택:', (error as Error).stack);
+        console.error('분석 오류:', error);
         addMessage({
           type: 'bot',
           content: `분석 중 오류가 발생했습니다: ${(error as Error).message}\n\n다시 시도해주세요.`,

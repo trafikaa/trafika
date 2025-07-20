@@ -65,10 +65,10 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
           <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
             <div className="font-medium mb-1">주요 재무비율</div>
             <div className="space-y-1">
-              <div>부채비율: {message.data.ratios.debtRatio.toFixed(2)}%</div>
-              <div>유동비율: {message.data.ratios.currentRatio.toFixed(2)}</div>
-              <div>자기자본비율: {message.data.ratios.equityRatio.toFixed(2)}%</div>
-              <div>ROA: {message.data.ratios.roa.toFixed(2)}%</div>
+              <div>부채비율: {message.data.ratios.debt_ratio?.toFixed(2) || 'N/A'}%</div>
+              <div>유동비율: {message.data.ratios.current_ratio?.toFixed(2) || 'N/A'}</div>
+              <div>자기자본비율: {message.data.ratios.equity_ratio?.toFixed(2) || 'N/A'}%</div>
+              <div>ROA: {message.data.ratios.pretax_income_to_total_assets?.toFixed(2) || 'N/A'}%</div>
             </div>
           </div>
         )}
