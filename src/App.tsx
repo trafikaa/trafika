@@ -34,19 +34,14 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-sky-500">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-4 py-4">
+        <div className="max-w-6xl mx-auto px-4 py-2">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-lg">
-                <Bot className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-800">고도화된 부실기업 경고 시스템</h1>
-                <p className="text-sm text-gray-600">DART API 연동 • AI 기반 재무 위험 분석 • ChatGPT 연동</p>
-              </div>
+            <div className="flex items-center gap-2">
+              <img src="/logo2.png" alt="혜서 로고" className="h-12 w-auto object-contain" />
+              <h1 className="text-lg font-bold text-gray-800">고도화된 부실기업 경고 시스템</h1>
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1 text-sm text-gray-500">
@@ -150,8 +145,8 @@ function App() {
 
         {/* Enhanced Footer */}
         <footer className="mt-6 text-center">
-          <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-            <div className="flex items-center justify-center gap-6 text-sm text-gray-600">
+          <div className="bg-black rounded-lg shadow-sm p-4 mb-4">
+            <div className="flex items-center justify-center gap-6 text-sm text-white">
               <div className="flex items-center gap-1">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                 <span>DART API 연동</span>
@@ -170,7 +165,7 @@ function App() {
               </div>
             </div>
           </div>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-white">
             ⚠️ 본 시스템은 참고용으로만 사용하시고, 투자 결정 시 전문가와 상담하시기 바랍니다.
           </p>
         </footer>
