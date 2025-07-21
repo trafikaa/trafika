@@ -45,7 +45,7 @@ class DelistDataLoader:
             
             # listed_company = 0인 기업들만 조회 (상장 폐지된 기업)
             params = {
-                'select': 'ticker,company_name,corp_code',
+                'select': 'ticker,corp_name,corp_code,listed_company',
                 'listed_company': 'eq.0'
             }
             
@@ -108,12 +108,9 @@ class DelistDataLoader:
                 print("⚠️ 폐지일 정보가 없습니다. 기본값 2022년을 사용합니다.")
                 return "2022"
             
-            # 폐지일을 datetime 객체로 변환
-            delisting_dt = datetime.strptime(delisting_date, '%Y-%m-%d')
-            
-            # 폐지 직전년도 계산 (폐지일에서 1년 차감)
-            target_dt = delisting_dt - timedelta(days=365)
-            target_year = str(target_dt.year)
+            # 폐지일에서 연도만 추출하고 -1
+            year = int(delisting_date[:4])
+            target_year = str(year - 1)
             
             print(f"폐지일: {delisting_date} → 대상연도: {target_year}")
             return target_year
@@ -221,78 +218,24 @@ class DelistDataLoader:
         print("❌ 재무제표 데이터를 찾을 수 없습니다.")
         return [], ""
     
-    def save_financial_data_to_supabase(self, ticker: str, year: str, financial_data: List[Dict[str, Any]], fs_div: str) -> bool:
+    def __init__(self):
         """
-        재무 데이터를 Supabase에 저장
+        상장 폐지 기업 재무 데이터 로더 초기화
+        """
+        self.supabase_url = os.getenv('SUPABASE_URL')
+        self.supabase_key = os.getenv('SUPABASE_ANON_KEY')
+        self.dart_api_key = os.getenv('DART_API_KEY')
         
-        Args:
-            ticker (str): 종목 코드
-            year (str): 연도
-            financial_data (List[Dict[str, Any]]): 재무 데이터
-            fs_div (str): 재무제표 구분
-            
-        Returns:
-            bool: 저장 성공 여부
-        """
-        try:
-            url = f"{self.supabase_url}/rest/v1/delisted_financials"
-            headers = {
-                'apikey': self.supabase_key,
-                'Authorization': f'Bearer {self.supabase_key}',
-                'Content-Type': 'application/json',
-                'Prefer': 'return=minimal'
-            }
-            
-            # 기존 데이터 삭제 (같은 ticker, year 조합)
-            delete_url = f"{self.supabase_url}/rest/v1/delisted_financials"
-            delete_params = {
-                'ticker': f'eq.{ticker}',
-                'year': f'eq.{year}'
-            }
-            
-            delete_response = requests.delete(delete_url, headers=headers, params=delete_params)
-            
-            # 새 데이터 삽입
-            for item in financial_data:
-                # 금액 데이터 숫자형 변환
-                this_term_amount = item.get('thstrm_amount', '0')
-                prev_term_amount = item.get('frmtrm_amount', '0')
-                
-                try:
-                    this_term_amount = float(this_term_amount.replace(',', '')) if this_term_amount and this_term_amount != '-' else 0
-                except:
-                    this_term_amount = 0
-                    
-                try:
-                    prev_term_amount = float(prev_term_amount.replace(',', '')) if prev_term_amount and prev_term_amount != '-' else 0
-                except:
-                    prev_term_amount = 0
-                
-                insert_data = {
-                    'ticker': ticker,
-                    'year': year,
-                    'account_id': item.get('account_id', ''),
-                    'account_nm': item.get('account_nm', ''),
-                    'account_detail': item.get('account_detail', ''),
-                    'this_term_amount': this_term_amount,
-                    'prev_term_amount': prev_term_amount,
-                    'statement_name': item.get('sj_nm', ''),
-                    'fs_div': fs_div,  # 재무제표 구분 추가
-                    'currency': item.get('currency', ''),
-                    'created_at': datetime.now().isoformat()
-                }
-                
-                response = requests.post(url, headers=headers, json=insert_data)
-                if response.status_code not in [200, 201]:
-                    print(f"데이터 저장 실패: {response.status_code} - {response.text}")
-                    return False
-            
-            print(f"{ticker} {year}년 데이터 저장 완료 ({len(financial_data)}개 항목, {fs_div})")
-            return True
-            
-        except Exception as e:
-            print(f"Supabase 저장 중 오류 발생: {e}")
-            return False
+        if not self.supabase_url or not self.supabase_key:
+            raise ValueError("Supabase URL과 API 키가 필요합니다. .env 파일을 확인해주세요.")
+        
+        if not self.dart_api_key:
+            raise ValueError("DART API 키가 필요합니다. .env 파일을 확인해주세요.")
+        
+        self.dart_base_url = "https://opendart.fss.or.kr/api"
+        
+        # CSV 데이터를 저장할 리스트
+        self.all_csv_data = []
     
     def process_delisted_company(self, company: Dict[str, Any]) -> bool:
         """
@@ -318,10 +261,13 @@ class DelistDataLoader:
         
         if not delisting_date:
             print(f"폐지일이 없습니다: {ticker}")
-            return False
+            print("기본값 2022년을 사용합니다.")
+            target_year = "2022"
+        else:
+            # 폐지 직전년도 계산
+            target_year = self.calculate_target_year(delisting_date)
         
-        # 폐지 직전년도 계산
-        target_year = self.calculate_target_year(delisting_date)
+
         
         # 재무제표 데이터 조회 (우선순위 적용)
         financial_data, fs_div = self.get_financial_data_with_priority(corp_code, target_year)
@@ -330,8 +276,8 @@ class DelistDataLoader:
             print(f"재무제표 데이터가 없습니다: {ticker}")
             return False
         
-        # Supabase에 저장
-        success = self.save_financial_data_to_supabase(ticker, target_year, financial_data, fs_div)
+        # CSV 데이터 수집
+        success = self.collect_financial_data_for_csv(ticker, target_year, financial_data, fs_div)
         
         if success:
             print(f"✅ {company_name} ({ticker}) 데이터 처리 완료")
@@ -339,6 +285,81 @@ class DelistDataLoader:
             print(f"❌ {company_name} ({ticker}) 데이터 처리 실패")
         
         return success
+    
+    def collect_financial_data_for_csv(self, ticker: str, year: str, financial_data: List[Dict[str, Any]], fs_div: str) -> bool:
+        """
+        재무 데이터를 CSV용으로 수집
+        
+        Args:
+            ticker (str): 종목 코드
+            year (str): 연도
+            financial_data (List[Dict[str, Any]]): 재무 데이터
+            fs_div (str): 재무제표 구분
+            
+        Returns:
+            bool: 수집 성공 여부
+        """
+        try:
+            # 데이터 변환
+            for item in financial_data:
+                # 금액 데이터 숫자형 변환
+                this_term_amount = item.get('thstrm_amount', '0')
+                prev_term_amount = item.get('frmtrm_amount', '0')
+                
+                try:
+                    this_term_amount = float(this_term_amount.replace(',', '')) if this_term_amount and this_term_amount != '-' else 0
+                except:
+                    this_term_amount = 0
+                    
+                try:
+                    prev_term_amount = float(prev_term_amount.replace(',', '')) if prev_term_amount and prev_term_amount != '-' else 0
+                except:
+                    prev_term_amount = 0
+                
+                csv_row = {
+                    'ticker': ticker,
+                    'year': year,
+                    'account_id': item.get('account_id', ''),
+                    'account_nm': item.get('account_nm', '').strip(),
+                    'account_detail': item.get('account_detail', ''),
+                    'this_term_amount': this_term_amount,
+                    'prev_term_amount': prev_term_amount,
+                    'statement_name': item.get('sj_nm', ''),
+                    'fs_div': fs_div
+                }
+                self.all_csv_data.append(csv_row)
+            
+            print(f"{ticker} {year}년 데이터 수집 완료 ({len(financial_data)}개 항목, {fs_div})")
+            return True
+            
+        except Exception as e:
+            print(f"데이터 수집 중 오류 발생: {e}")
+            return False
+    
+    def save_all_data_to_csv(self):
+        """
+        수집된 모든 데이터를 하나의 CSV 파일로 저장
+        """
+        try:
+            if not self.all_csv_data:
+                print("저장할 데이터가 없습니다.")
+                return
+            
+            # CSV 파일명 생성
+            csv_filename = "data/delisted_financials_all.csv"
+            
+            # data 폴더가 없으면 생성
+            os.makedirs("data", exist_ok=True)
+            
+            # DataFrame으로 변환하여 CSV 저장
+            df = pd.DataFrame(self.all_csv_data)
+            df.to_csv(csv_filename, index=False, encoding='utf-8-sig')
+            
+            print(f"전체 데이터 CSV 저장 완료 ({len(self.all_csv_data)}개 항목)")
+            print(f"파일 위치: {csv_filename}")
+            
+        except Exception as e:
+            print(f"CSV 저장 중 오류 발생: {e}")
     
     def process_all_delisted_companies(self, limit: Optional[int] = None):
         """
@@ -375,6 +396,9 @@ class DelistDataLoader:
             time.sleep(0.3)
         
         print(f"\n처리 완료: {success_count}/{total_count} 성공")
+        
+        # 모든 데이터를 하나의 CSV 파일로 저장
+        self.save_all_data_to_csv()
 
 def main():
     """
