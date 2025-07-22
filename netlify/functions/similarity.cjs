@@ -15,14 +15,13 @@ exports.handler = async function(event, context) {
     const { data: userRows, error: userError } = await supabase
       .from('2024_ratio')
       .select('*')
-      .eq('ticker', ticker)
-      .limit(1);
+      .eq('ticker', ticker);
 
     if (userError) throw userError;
     if (!userRows || userRows.length === 0) {
       return {
         statusCode: 404,
-        body: JSON.stringify({ error: `해당 ticker(${ticker})의 2024_ratio 데이터가 없습니다. (${userRows})` })
+        body: JSON.stringify({ error: `해당 ticker(${ticker})의 2024_ratio 데이터가 없습니다.` })
       };
     }
 
