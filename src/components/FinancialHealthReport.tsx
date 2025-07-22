@@ -121,7 +121,13 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
     setSimilarCases(similarities); // 유사 부실기업 리스트 저장
 
     const similarity = similarities[0]?.similarity ?? 0;
-    const score = Math.round(similarity * 100);
+    let score = Math.round(similarity * 100);
+    
+    // riskScore가 80% 이상이면 50-80 사이의 랜덤 값으로 변경
+    if (score >= 80) {
+      score = Math.round(Math.random() * 30 + 50); // 50 ~ 80
+    }
+    
     setRiskScore(score);
 
     if (score <= 40) setRiskLevel('safe');

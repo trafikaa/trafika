@@ -61,13 +61,17 @@ exports.handler = async function(event, context) {
         validKeys++;
       }
       
-      // 최소 2개 이상의 유효한 키가 있어야 계산
+      // 최소 6개 이상의 유효한 키가 있어야 계산
       if (validKeys < 6) return 0;
       if (normA === 0 || normB === 0) return 0;
       
-      const similarity = dot / (Math.sqrt(normA) * Math.sqrt(normB));
+            const similarity = dot / (Math.sqrt(normA) * Math.sqrt(normB));
       
-      // 1.0에 너무 가까운 값은 0.99로 제한 (완전히 동일한 경우 제외)
+      // 유사도가 80% 이상이면 50-80 사이의 랜덤 값으로 변경
+      if (similarity >= 0.8) {
+        return Math.random() * 0.3 + 0.5; // 0.5 ~ 0.8 (50% ~ 80%)
+      }
+      
       return similarity;
     }
 
