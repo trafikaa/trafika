@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { FinancialRatios, CompanyData } from '../types';
+import { FinancialRatios, CompanyData, CompanyInfo } from '../types';
 import { TrendingUp, TrendingDown, DollarSign, Shield, AlertTriangle, CheckCircle } from 'lucide-react';
 import FearGreedIndex from './FearGreedIndex';
 import { fetchRiskSimilarity } from '../services/similarityApi';
@@ -8,9 +8,10 @@ import { useState } from 'react';
 interface FinancialHealthReportProps {
   ratios: FinancialRatios;
   data: CompanyData;
+  companyInfo: CompanyInfo;
 }
 
-const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, data }) => {
+const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, data, companyInfo }) => {
   const getHealthScore = (value: number | null, thresholds: { good: number; fair: number }, isHigherBetter: boolean = true) => {
     if (value === null) return { score: 'unknown', color: 'text-gray-600', bg: 'bg-gray-50' };
     
@@ -113,9 +114,9 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
   const [riskLevel, setRiskLevel] = useState<'safe' | 'caution' | 'danger'>('safe');
   const [similarCases, setSimilarCases] = useState<any[]>([]);
 
-  const handleAnalyze = async (companyData: CompanyData) => {
-    console.log('onSubmit에서 받은 companyData:', companyData);
-    const similarities = await fetchRiskSimilarity(companyData);
+  const handleAnalyze = async (companyInfo: CompanyInfo) => {
+    console.log('onSubmit에서 받은 companyData:', companyInfo);
+    const similarities = await fetchRiskSimilarity(companyInfo.ticker);
     console.log('similarities API 응답:', similarities);
     setSimilarCases(similarities); // 유사 부실기업 리스트 저장
 
@@ -129,10 +130,10 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
   };
 
   useEffect(() => {
-    if (data) {
-      handleAnalyze(data);
+    if (companyInfo) {
+      handleAnalyze(companyInfo);
     }
-  }, [data]);
+  }, [companyInfo]);
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl mx-auto">

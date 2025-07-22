@@ -6,7 +6,7 @@ import { dartApi } from '../services/dartApi';
 import { getCompanyInfoByName, getFinancialRatiosByTicker, CompanyInfo } from '../services/companyService';
 import { chatgptApi } from '../services/chatgptApi';
 
-export const useEnhancedChat = () => {
+export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
@@ -19,7 +19,7 @@ export const useEnhancedChat = () => {
   const [currentStep, setCurrentStep] = useState<ChatStep>('company-name');
   const [companyName, setCompanyName] = useState('');
   const [companyData, setCompanyData] = useState<CompanyData | null>(null);
-  const [currentCompanyInfo, setCurrentCompanyInfo] = useState<CompanyInfo | null>(null);
+  const [currentCompanyInfo, setCurrentCompanyInfo] = useState<CompanyInfo | null>(companyInfo || null);
   const [isTyping, setIsTyping] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -259,6 +259,7 @@ export const useEnhancedChat = () => {
             riskLevel: riskAssessment.level,
             riskScore: riskAssessment.score,
             companyData: data,
+            companyInfo: currentCompanyInfo,
           },
         });
 

@@ -5,9 +5,12 @@ import UnifiedFinancialForm from './components/UnifiedFinancialForm';
 import TypingIndicator from './components/TypingIndicator';
 import SplashScreen from './components/SplashScreen';
 import { useEnhancedChat } from './hooks/useEnhancedChat';
+import { CompanyInfo } from './types';
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
+  const [userInput, setUserInput] = useState('');
+  const [currentCompanyInfo, setCurrentCompanyInfo] = useState<CompanyInfo | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 2000);
@@ -26,9 +29,7 @@ function App() {
     handleFinancialDataSubmit,
     handleGeneralChat,
     resetChat,
-  } = useEnhancedChat();
-
-  const [userInput, setUserInput] = useState('');
+  } = useEnhancedChat(currentCompanyInfo);
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -113,6 +114,7 @@ function App() {
               <div className="flex justify-center">
                 <UnifiedFinancialForm 
                   onSubmit={handleFinancialDataSubmit}
+                  onCompanyInfoChange={setCurrentCompanyInfo}
                   companyName={companyName}
                   initialData={companyData}
                 />

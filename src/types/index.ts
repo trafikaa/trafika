@@ -1,5 +1,7 @@
 export interface CompanyData {
   name: string;
+  corp_code?: string;
+  ticker?: string;
   totalAssets: number;
   totalLiabilities: number;
   equity: number;
@@ -8,6 +10,10 @@ export interface CompanyData {
   revenue: number;
   netIncome: number;
   operatingCashFlow: number;
+}
+
+export interface CompanyInfo {
+  corp_code: string;
   ticker: string;
 }
 
@@ -32,6 +38,7 @@ export interface ChatMessageData {
   riskLevel?: 'safe' | 'caution' | 'danger';
   riskScore?: number;
   companyData?: CompanyData;
+  companyInfo?: CompanyInfo;
 }
 
 export interface ChatMessage {

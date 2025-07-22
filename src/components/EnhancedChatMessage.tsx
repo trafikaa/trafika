@@ -74,11 +74,12 @@ const EnhancedChatMessage: React.FC<EnhancedChatMessageProps> = ({ message }) =>
         )}
 
         {/* 재무건전성 보고서 */}
-        {message.data?.ratios && message.data?.companyData && (
+        {message.data?.ratios && message.data?.companyData && message.data?.companyInfo && (
           <div className="mb-4">
             <FinancialHealthReport 
               ratios={message.data.ratios}
               data={message.data.companyData}
+              companyInfo={message.data.companyInfo}
             />
           </div>
         )}

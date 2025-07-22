@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CompanyData } from '../types';
+import { CompanyData, CompanyInfo } from '../types';
 import { Calculator, Building, RefreshCw } from 'lucide-react';
 import { getCompanyInfoByName } from '../services/companyService';
 import { fetchDartFinancialStatement } from '../services/dartApi';
@@ -7,12 +7,15 @@ import { DART_DEFAULT_YEAR } from '../constants/finance';
 
 interface UnifiedFinancialFormProps {
   onSubmit: (data: CompanyData) => void;
+  onCompanyInfoChange?: (companyInfo: CompanyInfo | null) => void;
   companyName?: string;
   initialData?: CompanyData | null; // 추가된 prop
 }
 
 const defaultForm: Partial<CompanyData> = {
   name: '',
+  corp_code: '',
+  ticker: '',
   totalAssets: 0,
   totalLiabilities: 0,
   equity: 0,
@@ -25,6 +28,7 @@ const defaultForm: Partial<CompanyData> = {
 
 const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({ 
   onSubmit, 
+  onCompanyInfoChange,
   companyName = '',
   initialData = null 
 }) => {
@@ -33,6 +37,7 @@ const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({
     name: companyName,
     ...(initialData || {}) // initialData가 있으면 사용
   });
+  const [companyInfo, setCompanyInfo] = useState<CompanyInfo | null>(null);
   const [autoFilled, setAutoFilled] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,6 +70,11 @@ const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({
           setLoading(false);
           return;
         }
+        
+        // companyInfo 데이터를 formData에 저장
+        setCompanyInfo(companyInfo);
+        onCompanyInfoChange?.(companyInfo);
+        
         const dartInfo = await fetchDartFinancialStatement(companyInfo.corp_code, DART_DEFAULT_YEAR);
         console.log('DART 재무제표 응답:', dartInfo);
         if (dartInfo && dartInfo.status === '000') {
