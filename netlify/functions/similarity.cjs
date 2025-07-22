@@ -11,6 +11,9 @@ exports.handler = async function(event, context) {
     // 1. 유저가 검색한 ticker를 가져옴
     const { ticker } = userData;
 
+    console.log('ticker:', ticker);
+    console.log('ticker type:', typeof ticker);
+
     // 2. Supabase에서 해당 ticker의 2024_ratio row를 가져옴
     const { data: userRows, error: userError } = await supabase
       .from('2024_ratio')
