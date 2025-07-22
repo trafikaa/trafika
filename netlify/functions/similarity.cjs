@@ -27,6 +27,7 @@ exports.handler = async function(event, context) {
       };
     }
     const userRatios = calcRatios(userData);
+    console.log('userRatios:', userRatios);
 
     // 3. 코사인 유사도 계산
     function cosineSimilarity(a, b, keys) {
