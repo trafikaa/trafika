@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FinancialRatios, CompanyData } from '../types';
 import { TrendingUp, TrendingDown, DollarSign, Shield, AlertTriangle, CheckCircle } from 'lucide-react';
+import FearGreedIndex from './FearGreedIndex';
+import { fetchRiskSimilarity } from '../services/similarityApi';
+import { useState } from 'react';
 
 interface FinancialHealthReportProps {
   ratios: FinancialRatios;
@@ -106,6 +109,29 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
 
   const overall = overallHealth();
 
+  const [riskScore, setRiskScore] = useState<number | null>(null);
+  const [riskLevel, setRiskLevel] = useState<'safe' | 'caution' | 'danger'>('safe');
+  const [similarCases, setSimilarCases] = useState<any[]>([]);
+
+  const handleAnalyze = async (companyData: CompanyData) => {
+    const similarities = await fetchRiskSimilarity(companyData);
+    setSimilarCases(similarities); // 유사 부실기업 리스트 저장
+
+    const similarity = similarities[0]?.similarity ?? 0;
+    const score = Math.round(similarity * 100);
+    setRiskScore(score);
+
+    if (score <= 40) setRiskLevel('safe');
+    else if (score <= 60) setRiskLevel('caution');
+    else setRiskLevel('danger');
+  };
+
+  useEffect(() => {
+    if (data) {
+      handleAnalyze(data);
+    }
+  }, [data]);
+
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl mx-auto">
       <div className="mb-6">
@@ -178,6 +204,26 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
           {ratios.roe && ratios.roe < 10 && <li>• 자기자본 수익률 향상을 위한 사업 효율성 개선 권장</li>}
           {data.operatingCashFlow < 0 && <li>• 영업현금흐름 개선을 위한 운영 효율성 제고 필요</li>}
         </ul>
+      </div>
+
+      {/* 부실 위험도 지수 */}
+      <div className="mt-6 p-4 bg-purple-50 rounded-lg">
+        <h4 className="font-semibold text-purple-800 mb-2">💡 부실 위험도 지수</h4>
+        <FearGreedIndex score={riskScore ?? 0} level={riskLevel} />
+
+        {/* 유사 부실기업 정보 추가 */}
+        {similarCases.length > 0 && (
+          <div className="mt-4">
+            <div className="font-semibold text-purple-700 mb-1">가장 유사한 과거 부실기업</div>
+            <ul className="text-sm text-purple-800 space-y-1">
+              {similarCases.map((item, idx) => (
+                <li key={idx}>
+                  • {item.ticker} ({item.year}) - 유사도: {(item.similarity * 100).toFixed(1)}%
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );
