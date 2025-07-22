@@ -26,8 +26,9 @@ exports.handler = async function(event, context) {
         asset_growth: data.asset_growth      // 필요시 프론트에서 계산해서 넘김
       };
     }
+    console.log('userData (원본):', userData);
     const userRatios = calcRatios(userData);
-    console.log('userRatios:', userRatios);
+    console.log('userRatios (계산 결과):', userRatios);
 
     // 3. 코사인 유사도 계산
     function cosineSimilarity(a, b, keys) {
