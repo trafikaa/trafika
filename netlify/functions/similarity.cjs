@@ -22,7 +22,7 @@ exports.handler = async function(event, context) {
     if (!userRows || userRows.length === 0) {
       return {
         statusCode: 404,
-        body: JSON.stringify({ error: `해당 ticker(${ticker})의 2024_ratio 데이터가 없습니다. 타입(${typeof ticker})` })
+        body: JSON.stringify({ error: `해당 ticker(${ticker})의 2024_ratio 데이터가 없습니다. (${userRows})` })
       };
     }
 
