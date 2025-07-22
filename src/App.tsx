@@ -1,11 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bot, TrendingDown, RefreshCw, Database } from 'lucide-react';
 import EnhancedChatMessage from './components/EnhancedChatMessage';
 import UnifiedFinancialForm from './components/UnifiedFinancialForm';
 import TypingIndicator from './components/TypingIndicator';
+import SplashScreen from './components/SplashScreen';
 import { useEnhancedChat } from './hooks/useEnhancedChat';
 
 function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSplash(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (showSplash) return <SplashScreen />;
+
   const {
     messages,
     currentStep,
