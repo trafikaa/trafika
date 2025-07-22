@@ -2,6 +2,7 @@ import os
 import requests
 import pandas as pd
 import json
+import argparse
 from datetime import datetime
 from typing import List, Dict, Any, Optional, Tuple
 from dotenv import load_dotenv
@@ -39,14 +40,19 @@ class FinancialDataLoader:
             'ifrs-full_CurrentLiabilities': '유동부채',
             'ifrs-full_Revenue': '매출액',
             'ifrs-full_GrossProfit': '매출액',
+            'ifrs-full_ProfitLossFromOperatingActivities': '영업이익',
+            'dart_OperatingIncomeLoss': '영업이익',
             'ifrs-full_ProfitLoss': '당기순이익',
             'ifrs-full_CashFlowsFromUsedInOperatingActivities': '영업활동현금흐름'
         }
     
-    def get_listed_companies(self) -> List[Dict[str, Any]]:
+    def get_listed_companies(self, batch_number: int = 0) -> List[Dict[str, Any]]:
         """
-        Supabase의 ticker_info 테이블에서 상장된 기업 목록 가져오기
+        Supabase의 ticker_info 테이블에서 상장된 기업 목록 가져오기 (배치별)
         
+        Args:
+            batch_number (int): 배치 번호 (0, 1, 2, 3)
+            
         Returns:
             List[Dict[str, Any]]: 상장 기업 목록
         """
@@ -59,17 +65,24 @@ class FinancialDataLoader:
                 'Content-Type': 'application/json'
             }
             
+            # 1000개씩 4번 나누어서 처리
+            limit = 1000
+            offset = batch_number * limit
+            
             # listed_company = 1인 기업들만 조회 (상장된 기업)
             params = {
                 'select': 'ticker,corp_name,corp_code,listed_company',
-                'listed_company': 'eq.1'
+                'listed_company': 'eq.1',
+                'limit': limit,
+                'offset': offset
             }
             
             response = requests.get(url, headers=headers, params=params)
             response.raise_for_status()
             
             companies = response.json()
-            print(f"상장 기업 {len(companies)}개 발견")
+            
+            print(f"배치 {batch_number + 1}/4: {len(companies)}개 기업 가져옴 (offset: {offset})")
             
             return companies
             
@@ -160,6 +173,11 @@ class FinancialDataLoader:
         for item in financial_data:
             account_id = item.get('account_id', '')
             account_nm = item.get('account_nm', '').strip()
+            statement_name = item.get('sj_nm', '')
+            
+            # ifrs-full_ProfitLoss가 현금흐름표에 있는 경우 제외
+            if account_id == 'ifrs-full_ProfitLoss' and '현금흐름표' in statement_name:
+                continue
             
             # account_id 또는 account_nm이 대상 계정과목인지 확인
             is_target = False
@@ -241,7 +259,7 @@ class FinancialDataLoader:
     
     def save_all_data_to_csv(self, year: str):
         """
-        수집된 모든 데이터를 연도별 CSV 파일로 저장
+        수집된 모든 데이터를 연도별 CSV 파일로 저장 (기존 형태)
         
         Args:
             year (str): 연도
@@ -261,11 +279,82 @@ class FinancialDataLoader:
             df = pd.DataFrame(self.all_csv_data)
             df.to_csv(csv_filename, index=False, encoding='utf-8-sig')
             
-            print(f"{year}년 데이터 CSV 저장 완료 ({len(self.all_csv_data)}개 항목)")
+            print(f"{year}년 데이터 CSV 저장 완료 (기존 형태: {len(self.all_csv_data)}개 항목)")
             print(f"파일 위치: {csv_filename}")
             
         except Exception as e:
             print(f"CSV 저장 중 오류 발생: {e}")
+    
+    def transform_data_for_supabase(self, year: str) -> List[Dict[str, Any]]:
+        """
+        Supabase 저장용으로 데이터 구조 변환
+        ticker별로 한 행에 모든 계정과목을 컬럼으로 가지도록 변환
+        
+        Args:
+            year (str): 연도
+            
+        Returns:
+            List[Dict[str, Any]]: 변환된 데이터
+        """
+        if not self.all_csv_data:
+            return []
+        
+        # ticker별로 데이터 그룹화
+        ticker_data = {}
+        
+        for item in self.all_csv_data:
+            ticker = item['ticker']
+            account_id = item['account_id']
+            
+            if ticker not in ticker_data:
+                ticker_data[ticker] = {
+                    'ticker': ticker,
+                    'fs_div': item['fs_div']
+                }
+            
+            # 영어 계정명을 컬럼명으로 사용
+            column_name = account_id
+            
+            # 당기금액만 저장
+            ticker_data[ticker][f"{column_name}"] = item['this_term_amount']
+        
+        return list(ticker_data.values())
+    
+    def save_wide_format_csv(self, year: str):
+        """
+        넓은 형태(wide format)로 CSV 파일 저장
+        ticker별로 한 행에 모든 계정과목을 컬럼으로 가지도록 저장
+        
+        Args:
+            year (str): 연도
+        """
+        try:
+            if not self.all_csv_data:
+                print("저장할 데이터가 없습니다.")
+                return
+            
+            # 데이터 구조 변환
+            wide_data = self.transform_data_for_supabase(year)
+            
+            if not wide_data:
+                print("변환할 데이터가 없습니다.")
+                return
+            
+            # CSV 파일명 생성 (연도별, wide format)
+            csv_filename = f"data/listed_financials_wide_{year}.csv"
+            
+            # data 폴더가 없으면 생성
+            os.makedirs("data", exist_ok=True)
+            
+            # DataFrame으로 변환하여 CSV 저장
+            df = pd.DataFrame(wide_data)
+            df.to_csv(csv_filename, index=False, encoding='utf-8-sig')
+            
+            print(f"{year}년 데이터 Wide Format CSV 저장 완료 ({len(wide_data)}개 기업)")
+            print(f"파일 위치: {csv_filename}")
+            
+        except Exception as e:
+            print(f"Wide Format CSV 저장 중 오류 발생: {e}")
     
     def process_listed_company(self, company: Dict[str, Any], year: str = "2024") -> bool:
         """
@@ -307,7 +396,7 @@ class FinancialDataLoader:
     
     def process_all_listed_companies(self, year: str = "2024", limit: Optional[int] = None):
         """
-        모든 상장 기업 데이터 처리
+        모든 상장 기업 데이터 처리 (4개 배치로 나누어 처리)
         
         Args:
             year (str): 연도
@@ -316,66 +405,78 @@ class FinancialDataLoader:
         print(f"상장 기업 재무 데이터 수집 시작 ({year}년)")
         print("대상 계정과목: 자산총계, 부채총계, 자본총계, 유동자산, 유동부채, 매출액, 당기순이익, 영업활동현금흐름")
         
-        # 상장 기업 목록 가져오기
-        companies = self.get_listed_companies()
+        total_success_count = 0
+        total_companies_count = 0
         
-        if not companies:
-            print("상장 기업이 없습니다.")
-            return
-        
-        if limit:
-            companies = companies[:limit]
-            print(f"테스트 모드: {limit}개 기업만 처리")
-        
-        success_count = 0
-        total_count = len(companies)
-        
-        for i, company in enumerate(companies, 1):
-            print(f"\n진행률: {i}/{total_count} ({i/total_count*100:.1f}%)")
+        # 4개 배치로 나누어서 처리
+        for batch_num in range(4):
+            print(f"\n{'='*50}")
+            print(f"배치 {batch_num + 1}/4 처리 시작")
+            print(f"{'='*50}")
             
-            success = self.process_listed_company(company, year)
-            if success:
-                success_count += 1
+            # 배치별로 상장 기업 목록 가져오기
+            companies = self.get_listed_companies(batch_num)
             
-            # API 호출 제한 방지를 위한 딜레이
-            time.sleep(0.3)
+            if not companies:
+                print(f"배치 {batch_num + 1}에 상장 기업이 없습니다.")
+                continue
+            
+            print(f"배치 {batch_num + 1}: {len(companies)}개 기업 로드됨")
+            total_companies_count += len(companies)
+            
+            if limit:
+                companies = companies[:limit]
+                print(f"테스트 모드: {limit}개 기업만 처리")
+            
+            success_count = 0
+            total_count = len(companies)
+            
+            for i, company in enumerate(companies, 1):
+                print(f"\n진행률: {i}/{total_count} ({i/total_count*100:.1f}%)")
+                
+                success = self.process_listed_company(company, year)
+                if success:
+                    success_count += 1
+                
+                # API 호출 제한 방지를 위한 딜레이
+                time.sleep(0.3)
+            
+            total_success_count += success_count
+            print(f"\n배치 {batch_num + 1} 처리 완료: {success_count}/{total_count} 성공")
         
-        print(f"\n처리 완료: {success_count}/{total_count} 성공")
+        print(f"\n{'='*50}")
+        print(f"전체 처리 완료: {total_success_count}/{total_companies_count} 성공")
+        print(f"{'='*50}")
         
-        # 연도별 CSV 파일로 저장
+        # 연도별 CSV 파일로 저장 (기존 형태)
         self.save_all_data_to_csv(year)
+        
+        # Wide Format CSV 파일로 저장
+        self.save_wide_format_csv(year)
 
 def main():
     """
     메인 실행 함수
     """
+    # 명령행 인자 파싱
+    parser = argparse.ArgumentParser(description='상장 기업 재무 데이터 수집')
+    parser.add_argument('--year', type=str, default='2024', help='처리할 연도')
+    parser.add_argument('--limit', type=int, help='처리할 기업 수 제한 (테스트용)')
+    
+    args = parser.parse_args()
+    
     try:
         # 데이터 로더 초기화
         loader = FinancialDataLoader()
         
-        # 처리할 연도들
-        years = ["2022", "2023", "2024"]
+        # CSV 데이터 초기화
+        loader.all_csv_data = []
         
-        # 처리할 기업 수 제한 (테스트용)
-        limit_input = input("처리할 기업 수를 제한하시겠습니까? (숫자 입력 또는 엔터): ").strip()
-        limit = int(limit_input) if limit_input.isdigit() else None
-        
-        # 각 연도별로 처리
-        for year in years:
-            print(f"\n{'='*50}")
-            print(f"{year}년 데이터 처리 시작")
-            print(f"{'='*50}")
-            
-            # CSV 데이터 초기화 (연도별로 새로 시작)
-            loader.all_csv_data = []
-            
-            # 해당 연도의 상장 기업 처리
-            loader.process_all_listed_companies(year, limit)
-            
-            print(f"\n{year}년 처리 완료")
+        # 해당 연도의 상장 기업 처리
+        loader.process_all_listed_companies(args.year, args.limit)
         
         print(f"\n{'='*50}")
-        print("모든 연도 처리 완료!")
+        print(f"{args.year}년 처리 완료!")
         print(f"{'='*50}")
         
     except Exception as e:
