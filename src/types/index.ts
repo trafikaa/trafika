@@ -8,6 +8,7 @@ export interface CompanyData {
   revenue: number;
   netIncome: number;
   operatingCashFlow: number;
+  ticker: string;
 }
 
 export interface FinancialRatios {

@@ -6,13 +6,10 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 exports.handler = async function(event, context) {
   try {
-    const userData = JSON.parse(event.body);
+    const companyData = JSON.parse(event.body);
 
     // 1. 유저가 검색한 ticker를 가져옴
-    const { ticker } = userData;
-
-    console.log('ticker:', ticker);
-    console.log('ticker type:', typeof ticker);
+    const { ticker } = companyData.ticker;
 
     // 2. Supabase에서 해당 ticker의 2024_ratio row를 가져옴
     const { data: userRows, error: userError } = await supabase
