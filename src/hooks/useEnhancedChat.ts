@@ -62,13 +62,39 @@ export const useEnhancedChat = () => {
           userInput.includes(keyword)
         );
 
-        // ChatGPT API 호출을 위한 메시지 배열 구성
+        // (1) 재무 데이터 요약 메시지 생성
+        let financialSummary = '';
+        if (companyData) {
+          financialSummary += `\n\n[현재 기업: ${companyData.name}]`;
+          financialSummary += `\n- 자산총계: ${companyData.totalAssets}`;
+          financialSummary += `\n- 부채총계: ${companyData.totalLiabilities}`;
+          financialSummary += `\n- 자기자본: ${companyData.equity}`;
+          financialSummary += `\n- 유동자산: ${companyData.currentAssets}`;
+          financialSummary += `\n- 유동부채: ${companyData.currentLiabilities}`;
+          financialSummary += `\n- 매출: ${companyData.revenue}`;
+          financialSummary += `\n- 순이익: ${companyData.netIncome}`;
+          financialSummary += `\n- 영업현금흐름: ${companyData.operatingCashFlow}`;
+        }
+        // 가장 최근 메시지의 ratios를 찾아 요약
+        const lastRatios = messages.slice().reverse().find(m => m.data && m.data.ratios)?.data?.ratios;
+        if (lastRatios) {
+          financialSummary += `\n[주요 재무비율]`;
+          financialSummary += `\n- 부채비율: ${lastRatios.debt_ratio ?? 'N/A'}%`;
+          financialSummary += `\n- 유동비율: ${lastRatios.current_ratio ?? 'N/A'}`;
+          financialSummary += `\n- 자기자본비율: ${lastRatios.equity_ratio ?? 'N/A'}%`;
+          financialSummary += `\n- ROA: ${lastRatios.pretax_income_to_total_assets ?? 'N/A'}%`;
+          financialSummary += `\n- ROE: ${lastRatios.roe ?? 'N/A'}%`;
+          financialSummary += `\n- 영업이익률: ${lastRatios.operating_margin_on_total_assets ?? 'N/A'}%`;
+        }
+
+        // (2) ChatGPT API 호출을 위한 메시지 배열 구성
         const chatMessages = [
           {
             role: 'system' as const,
-            content: isFinancialQuestion 
+            content: (isFinancialQuestion 
               ? chatgptApi.getFinancialAnalysisPrompt()
               : chatgptApi.getGeneralChatPrompt()
+            ) + financialSummary // 시스템 프롬프트에 재무 요약 추가
           },
           ...messages
             .filter(msg => msg.type === 'user' || msg.type === 'bot')
@@ -105,7 +131,7 @@ export const useEnhancedChat = () => {
         setIsLoading(false);
       }
     }, 1000);
-  }, [messages, addMessage, simulateTyping]);
+  }, [messages, addMessage, simulateTyping, companyData]);
 
   const handleCompanyNameSubmit = useCallback(async (name: string) => {
     addMessage({
