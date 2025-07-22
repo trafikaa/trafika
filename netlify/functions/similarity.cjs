@@ -8,27 +8,28 @@ exports.handler = async function(event, context) {
   try {
     const userData = JSON.parse(event.body);
 
-    // 1. Supabase에서 delisted_ratios 테이블 불러오기
-    const { data: records, error } = await supabase
-      .from('delisted_ratios')
-      .select('*');
-    if (error) throw error;
+    // 1. 유저가 검색한 ticker를 가져옴
+    const { ticker } = userData;
 
-    // 2. 유저 데이터에서 7개 지표 계산
-    function calcRatios(data) {
+    // 2. Supabase에서 해당 ticker의 2024_ratio row를 가져옴
+    const { data: userRows, error: userError } = await supabase
+      .from('2024_ratio')
+      .select('*')
+      .eq('ticker', ticker)
+      .limit(1);
+
+    if (userError) throw userError;
+    if (!userRows || userRows.length === 0) {
       return {
-        current_ratio: data.currentAssets / data.currentLiabilities,
-        debt_ratio: data.totalLiabilities / data.equity,
-        ROA: data.netIncome / data.totalAssets,
-        ROE: data.netIncome / data.equity,
-        asset_turnover: data.revenue / data.totalAssets,
-        revenue_growth: data.revenue_growth, // 필요시 프론트에서 계산해서 넘김
-        asset_growth: data.asset_growth      // 필요시 프론트에서 계산해서 넘김
+        statusCode: 404,
+        body: JSON.stringify({ error: '해당 ticker의 2024_ratio 데이터가 없습니다.' })
       };
     }
-    console.log('userData (원본):', userData);
-    const userRatios = calcRatios(userData);
-    console.log('userRatios (계산 결과):', userRatios);
+
+    // 3. 7개 지표를 userRatios로 사용
+    const userRatios = userRows[0]; // current_ratio, debt_ratio, ROA, ROE, asset_turnover, revenue_growth, asset_growth
+
+    console.log('userRatios (2024_ratio에서 가져온 값):', userRatios);
 
     // 3. 코사인 유사도 계산
     function cosineSimilarity(a, b, keys) {
