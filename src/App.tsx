@@ -15,6 +15,7 @@ function App() {
   }, []);
 
   if (showSplash) return <SplashScreen />;
+  return <div>챗봇 화면</div>;
 
   const {
     messages,
