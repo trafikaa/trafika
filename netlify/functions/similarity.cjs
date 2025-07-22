@@ -40,7 +40,20 @@ exports.handler = async function(event, context) {
 
     console.log('userRatios:', userRatios); // 유저 ticker의 7개 지표
 
-    // 3. 코사인 유사도 계산
+    // 4. delisted_corp 테이블에서 부실기업 데이터 가져오기
+    const { data: records, error: delistedError } = await supabase
+      .from('delisted_corp')
+      .select('*');
+
+    if (delistedError) throw delistedError;
+    if (!records || records.length === 0) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ error: '부실기업 데이터를 찾을 수 없습니다.' })
+      };
+    }
+
+    // 5. 코사인 유사도 계산
     function cosineSimilarity(a, b, keys) {
       let dot = 0, normA = 0, normB = 0;
       for (const k of keys) {
