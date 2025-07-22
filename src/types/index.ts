@@ -14,8 +14,8 @@ export interface FinancialRatios {
   debt_ratio: number | null;
   current_ratio: number | null;
   equity_ratio: number | null;
-  pretax_income_to_total_assets: number | null; // ROA
-  roe: number | null;
+  ROA: number | null; // ROA
+  ROE: number | null;
   operating_margin_on_total_assets: number | null; // 영업이익률
 }
 

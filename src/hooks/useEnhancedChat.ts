@@ -82,8 +82,8 @@ export const useEnhancedChat = () => {
           financialSummary += `\n- 부채비율: ${lastRatios.debt_ratio ?? 'N/A'}%`;
           financialSummary += `\n- 유동비율: ${lastRatios.current_ratio ?? 'N/A'}`;
           financialSummary += `\n- 자기자본비율: ${lastRatios.equity_ratio ?? 'N/A'}%`;
-          financialSummary += `\n- ROA: ${lastRatios.pretax_income_to_total_assets ?? 'N/A'}%`;
-          financialSummary += `\n- ROE: ${lastRatios.roe ?? 'N/A'}%`;
+          financialSummary += `\n- ROA: ${lastRatios.ROA ?? 'N/A'}%`;
+          financialSummary += `\n- ROE: ${lastRatios.ROE ?? 'N/A'}%`;
           financialSummary += `\n- 영업이익률: ${lastRatios.operating_margin_on_total_assets ?? 'N/A'}%`;
         }
 
@@ -280,7 +280,7 @@ export const useEnhancedChat = () => {
       {
         id: '1',
         type: 'bot',
-        content: '안녕하세요! 고도화된 부실기업 경고 시스템입니다. 🏢\n\n기업명을 입력하시면 데이터베이스에서 기업 코드를 찾고, 다트(DART)에서 최신 재무정보를 자동으로 불러와 분석해드립니다.\n\n또한 재무 관련 질문이나 다른 궁금한 점이 있으시면 언제든지 물어보세요!',
+        content: '안녕하세요! 재무제표를 파헤치는 수다쟁이 혜서입니다. 🏢\n\n기업명을 입력하시면 데이터베이스에서 기업 코드를 찾고, 다트(DART)에서 최신 재무정보를 자동으로 불러와 분석해드립니다.\n\n또한 재무 관련 질문이나 다른 궁금한 점이 있으시면 언제든지 물어보세요!',
         timestamp: new Date(),
       }
     ]);

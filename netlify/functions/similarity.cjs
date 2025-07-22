@@ -48,10 +48,13 @@ exports.handler = async function(event, context) {
 
     const keys = ['current_ratio','debt_ratio','ROA','ROE','asset_turnover','revenue_growth','asset_growth'];
     const similarities = (records || [])
-      .map(r => ({
-        ticker: r.ticker,
-        similarity: cosineSimilarity(userRatios, r, keys)
-      }))
+      .map(r => {
+        const sim = cosineSimilarity(userRatios, r, keys);
+        return {
+          ticker: r.ticker,
+          similarity: (isNaN(sim) || sim === undefined || sim === null) ? 0 : sim
+        };
+      })
       .sort((a, b) => b.similarity - a.similarity)
       .slice(0, 5); // 상위 5개
 

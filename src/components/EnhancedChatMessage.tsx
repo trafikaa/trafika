@@ -90,8 +90,8 @@ const EnhancedChatMessage: React.FC<EnhancedChatMessageProps> = ({ message }) =>
               <div>부채비율: {message.data.ratios.debt_ratio?.toFixed(2) || 'N/A'}%</div>
               <div>유동비율: {message.data.ratios.current_ratio?.toFixed(2) || 'N/A'}</div>
               <div>자기자본비율: {message.data.ratios.equity_ratio?.toFixed(2) || 'N/A'}%</div>
-              <div>ROA: {message.data.ratios.pretax_income_to_total_assets?.toFixed(2) || 'N/A'}%</div>
-              <div>ROE: {message.data.ratios.roe?.toFixed(2) || 'N/A'}%</div>
+              <div>ROA: {message.data.ratios.ROA?.toFixed(2) || 'N/A'}%</div>
+              <div>ROE: {message.data.ratios.ROE?.toFixed(2) || 'N/A'}%</div>
               <div>영업이익률: {message.data.ratios.operating_margin_on_total_assets?.toFixed(2) || 'N/A'}%</div>
             </div>
           </div>

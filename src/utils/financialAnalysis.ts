@@ -39,11 +39,11 @@ export const assessRisk = (ratios: FinancialRatios, data: CompanyData): RiskAsse
   }
 
   // ROA 평가 (음수 위험) - null 체크 추가
-  if (ratios.pretax_income_to_total_assets !== null && ratios.pretax_income_to_total_assets < 0) {
+  if (ratios.ROA !== null && ratios.ROA < 0) {
     riskScore += 20;
     warnings.push('총자산수익률(ROA)이 음수로 수익성이 매우 낮습니다.');
     recommendations.push('수익성 개선을 위한 사업 구조조정이 필요합니다.');
-  } else if (ratios.pretax_income_to_total_assets !== null && ratios.pretax_income_to_total_assets < 3) {
+  } else if (ratios.ROA !== null && ratios.ROA < 3) {
     riskScore += 5;
     warnings.push('총자산수익률(ROA)이 낮아 수익성 개선이 필요합니다.');
     recommendations.push('자산 효율성 제고 및 수익성 개선 방안을 모색하세요.');

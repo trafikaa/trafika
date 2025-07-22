@@ -64,19 +64,19 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
     },
     {
       title: '총자산수익률(ROA)',
-      value: ratios.pretax_income_to_total_assets,
+      value: ratios.ROA,
       unit: '%',
       description: '순이익 / 총자산',
-      health: getHealthScore(ratios.pretax_income_to_total_assets, { good: 5, fair: 2 }),
+      health: getHealthScore(ratios.ROA, { good: 5, fair: 2 }),
       icon: <TrendingUp className="w-5 h-5" />,
       benchmark: '5% 이상 우수, 2% 이상 양호'
     },
     {
       title: '자기자본수익률(ROE)',
-      value: ratios.roe,
+      value: ratios.ROE,
       unit: '%',
       description: '순이익 / 자기자본',
-      health: getHealthScore(ratios.roe, { good: 15, fair: 10 }),
+      health: getHealthScore(ratios.ROE, { good: 15, fair: 10 }),
       icon: <TrendingUp className="w-5 h-5" />,
       benchmark: '15% 이상 우수, 10% 이상 양호'
     },
@@ -200,8 +200,8 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
         <ul className="text-sm text-blue-700 space-y-1">
           {ratios.debt_ratio && ratios.debt_ratio > 50 && <li>• 부채비율 개선을 위한 부채 축소 및 자기자본 확충 필요</li>}
           {ratios.current_ratio && ratios.current_ratio < 1.5 && <li>• 단기 유동성 개선을 위한 유동자산 증대 권장</li>}
-          {ratios.pretax_income_to_total_assets && ratios.pretax_income_to_total_assets < 2 && <li>• 자산 효율성 제고를 통한 수익성 개선 필요</li>}
-          {ratios.roe && ratios.roe < 10 && <li>• 자기자본 수익률 향상을 위한 사업 효율성 개선 권장</li>}
+          {ratios.ROA && ratios.ROA < 2 && <li>• 자산 효율성 제고를 통한 수익성 개선 필요</li>}
+          {ratios.ROE && ratios.ROE < 10 && <li>• 자기자본 수익률 향상을 위한 사업 효율성 개선 권장</li>}
           {data.operatingCashFlow < 0 && <li>• 영업현금흐름 개선을 위한 운영 효율성 제고 필요</li>}
         </ul>
       </div>
