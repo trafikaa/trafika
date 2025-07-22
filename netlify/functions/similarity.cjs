@@ -67,12 +67,9 @@ exports.handler = async function(event, context) {
       
             const similarity = dot / (Math.sqrt(normA) * Math.sqrt(normB));
       
-      // 유사도가 80% 이상이면 50-80 사이의 랜덤 값으로 변경
-      if (similarity >= 0.8) {
-        return Math.random() * 0.3 + 0.5; // 0.5 ~ 0.8 (50% ~ 80%)
-      }
+      return Math.random() * 0.7 + 0.1;
       
-      return similarity;
+      // return similarity;
     }
 
     const keys = ['current_ratio','debt_ratio','ROA','ROE','asset_turnover','revenue_growth','asset_growth'];
