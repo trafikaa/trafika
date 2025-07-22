@@ -35,6 +35,12 @@ exports.handler = async function(event, context) {
       };
     }
 
+    // 2. Supabase에서 해당 ticker의 2024_ratio row를 가져옴
+    const { data: records, error: recordsError } = await supabase
+      .from('2024_ratio')
+      .select('*')
+      .neq('ticker', ticker);
+
     // 3. 7개 지표를 userRatios로 사용
     const userRatios = userRows[0]; // current_ratio, debt_ratio, ROA, ROE, asset_turnover, revenue_growth, asset_growth
 
@@ -56,7 +62,7 @@ exports.handler = async function(event, context) {
     }
 
     const keys = ['current_ratio','debt_ratio','ROA','ROE','asset_turnover','revenue_growth','asset_growth'];
-    const similarities = (userRatios || [])
+    const similarities = (records || [])
       .map(r => {
         const sim = cosineSimilarity(userRatios, r, keys);
         console.log(`유사도 계산: user(${userRatios.ticker}) vs delisted(${r.ticker}) =`, sim);
