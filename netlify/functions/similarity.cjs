@@ -62,7 +62,7 @@ exports.handler = async function(event, context) {
       }
       
       // 최소 2개 이상의 유효한 키가 있어야 계산
-      if (validKeys < 2) return 0;
+      if (validKeys < 6) return 0;
       if (normA === 0 || normB === 0) return 0;
       
       const similarity = dot / (Math.sqrt(normA) * Math.sqrt(normB));
