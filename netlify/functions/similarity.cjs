@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const csvParse = require('csv-parse/lib/sync');
+const { parse } = require('csv-parse/sync');
 
 exports.handler = async function(event, context) {
   const userData = JSON.parse(event.body); // CompanyData 형태
@@ -8,7 +8,7 @@ exports.handler = async function(event, context) {
   // 1. CSV 읽기
   const csvPath = path.join(__dirname, '../../data/delisted_financials_with_metrics.csv');
   const csvData = fs.readFileSync(csvPath, 'utf-8');
-  const records = csvParse(csvData, { columns: true });
+  const records = parse(csvData, { columns: true });
 
   // 2. 유저 데이터에서 7개 지표 계산
   function calcRatios(data) {
