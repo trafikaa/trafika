@@ -40,7 +40,7 @@ function App() {
         <div className="max-w-6xl mx-auto px-4 py-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <img src="/logo2.png" alt="혜서 로고" className="h-12 w-auto object-contain" />
+              <img src="./public/logo2.png" alt="혜서 로고" className="h-12 w-auto object-contain" />
               <h1 className="text-lg font-bold text-gray-800">고도화된 부실기업 경고 시스템</h1>
             </div>
             <div className="flex items-center gap-3">
