@@ -14,9 +14,7 @@ function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  if (showSplash) return <SplashScreen />;
-  return <div>챗봇 화면</div>;
-
+  // 훅은 항상 최상단에서 호출!
   const {
     messages,
     currentStep,
@@ -44,6 +42,7 @@ function App() {
     }
   };
 
+  if (showSplash) return <SplashScreen />;
   return (
     <div className="min-h-screen bg-sky-500">
       {/* Header */}
