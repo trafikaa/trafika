@@ -29,7 +29,7 @@ exports.handler = async function(event, context) {
     // 3. 7개 지표를 userRatios로 사용
     const userRatios = userRows[0]; // current_ratio, debt_ratio, ROA, ROE, asset_turnover, revenue_growth, asset_growth
 
-    console.log('userRatios (2024_ratio에서 가져온 값):', userRatios);
+    console.log('userRatios:', userRatios); // 유저 ticker의 7개 지표
 
     // 3. 코사인 유사도 계산
     function cosineSimilarity(a, b, keys) {
@@ -50,6 +50,7 @@ exports.handler = async function(event, context) {
     const similarities = (records || [])
       .map(r => {
         const sim = cosineSimilarity(userRatios, r, keys);
+        console.log(`유사도 계산: user(${userRatios.ticker}) vs delisted(${r.ticker}) =`, sim);
         return {
           ticker: r.ticker,
           similarity: (isNaN(sim) || sim === undefined || sim === null) ? 0 : sim

@@ -114,7 +114,9 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
   const [similarCases, setSimilarCases] = useState<any[]>([]);
 
   const handleAnalyze = async (companyData: CompanyData) => {
+    console.log('onSubmit에서 받은 companyData:', companyData);
     const similarities = await fetchRiskSimilarity(companyData);
+    console.log('similarities API 응답:', similarities);
     setSimilarCases(similarities); // 유사 부실기업 리스트 저장
 
     const similarity = similarities[0]?.similarity ?? 0;

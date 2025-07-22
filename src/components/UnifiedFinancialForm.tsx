@@ -100,6 +100,7 @@ const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('분석 시작하기 클릭, formData:', formData);
     onSubmit(formData as CompanyData);
   };
 
@@ -259,7 +260,7 @@ function extractCompanyDataFromDart(dartInfo: any): Partial<CompanyData> {
   if (!dartInfo.list || !Array.isArray(dartInfo.list)) return result;
 
   dartInfo.list.forEach((item: any) => {
-    const amount = parseInt(item.thstrm_amount?.replace(/,/g, '') || '0', 10) / 100000000; // 억원 단위
+    const amount = parseInt(item.thstrm_amount?.replace(/,/g, '') || '0', 10); // 억원 단위
     switch (item.account_nm) {
       case '자산총계':
         result.totalAssets = amount;
