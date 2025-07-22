@@ -49,6 +49,8 @@ exports.handler = async function(event, context) {
     // 3. 코사인 유사도 계산
     function cosineSimilarity(a, b, keys) {
       let dot = 0, normA = 0, normB = 0;
+      let validKeys = 0;
+      
       for (const k of keys) {
         if (a[k] == null || b[k] == null || a[k] === '' || b[k] === '' || isNaN(a[k]) || isNaN(b[k])) continue;
         const va = parseFloat(a[k]);
@@ -56,9 +58,17 @@ exports.handler = async function(event, context) {
         dot += va * vb;
         normA += va * va;
         normB += vb * vb;
+        validKeys++;
       }
+      
+      // 최소 2개 이상의 유효한 키가 있어야 계산
+      if (validKeys < 2) return 0;
       if (normA === 0 || normB === 0) return 0;
-      return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+      
+      const similarity = dot / (Math.sqrt(normA) * Math.sqrt(normB));
+      
+      // 1.0에 너무 가까운 값은 0.99로 제한 (완전히 동일한 경우 제외)
+      return similarity;
     }
 
     const keys = ['current_ratio','debt_ratio','ROA','ROE','asset_turnover','revenue_growth','asset_growth'];
