@@ -1,8 +1,16 @@
 const { createClient } = require('@supabase/supabase-js');
 
-const supabaseUrl = process.env.SUPABASE_DATABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// 전역 변수로 Supabase 클라이언트 재사용
+let supabaseClient = null;
+
+function getSupabaseClient() {
+  if (!supabaseClient) {
+    const supabaseUrl = process.env.VITE_SUPABASE_DATABASE_URL || process.env.SUPABASE_DATABASE_URL;
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
+  }
+  return supabaseClient;
+}
 
 exports.handler = async function(event, context) {
   try {
@@ -10,6 +18,8 @@ exports.handler = async function(event, context) {
 
     // 1. 유저가 검색한 ticker를 가져옴
     const ticker = companyData.ticker;
+
+    const supabase = getSupabaseClient();
 
     // 2. Supabase에서 해당 ticker의 2024_ratio row를 가져옴
     const { data: userRows, error: userError } = await supabase
