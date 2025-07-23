@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { ChatMessage, ChatStep, CompanyData, FinancialRatios } from '../types';
 import { assessRisk } from '../utils/financialAnalysis';
 import { dartApi } from '../services/dartApi';
-// import { riskDatabase } from '../services/riskDatabase';
+//import { riskDatabase } from '../services/riskDatabase';
 import { getCompanyInfoByName, getFinancialRatiosByTicker, CompanyInfo } from '../services/companyService';
 import { chatgptApi } from '../services/chatgptApi';
 
@@ -191,15 +191,50 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
           };
 
           setCompanyData(fullCompanyData);
-          setCurrentStep('financial-data');
+          setCurrentStep('complete');
 
-          simulateTyping(() => {
+          // 이 부분을 주석 해제하고 활성화해야 합니다:
+          try {
             addMessage({
               type: 'bot',
-              content: `✅ ${name}의 재무정보를 성공적으로 불러왔습니다!\n\n아래에서 데이터를 확인하고 필요시 수정한 후 분석을 진행해주세요.`,
+              content: `${name}의 재무비율 데이터를 데이터베이스에서 조회 중입니다... 📊`,
+            });
+
+            const ratios = await getFinancialRatiosByTicker(companyInfo.ticker);
+            
+            if (!ratios) {
+              addMessage({
+                type: 'bot',
+                content: `죄송합니다. "${name}" 기업의 재무비율 데이터를 찾을 수 없습니다.\n\n다른 기업명으로 다시 시도해주시거나, 재무 관련 질문을 자유롭게 해주세요.`,
+              });
+              setIsLoading(false);
+              return;
+            }
+
+            // 위험도 평가
+            const riskAssessment = assessRisk(ratios, fullCompanyData);
+            
+            addMessage({
+              type: 'bot',
+              content: `✅ ${name}의 재무정보를 성공적으로 불러왔습니다!\n\n분석 결과는 아래와 같습니다.`,
+              data: {
+                ratios,
+                riskLevel: riskAssessment.level,
+                riskScore: riskAssessment.score,
+                companyData: fullCompanyData,
+                companyInfo: companyInfo,
+              },
+            });
+            
+            setIsLoading(false);
+          } catch (error) {
+            console.error('분석 오류:', error);
+            addMessage({
+              type: 'bot',
+              content: `분석 중 오류가 발생했습니다: ${(error as Error).message}\n\n다시 시도해주세요.`,
             });
             setIsLoading(false);
-          }, 1000);
+          }
         }, 1500);
       } catch (error) {
         console.error('기업 정보 조회 오류:', error);
@@ -214,67 +249,6 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
     }, 1000);
   }, [addMessage, simulateTyping, handleGeneralChat]);
 
-  const handleFinancialDataSubmit = useCallback(async (data: CompanyData) => {
-    addMessage({
-      type: 'user',
-      content: `${data.name} 기업의 재무정보 분석을 시작합니다.`,
-    });
-
-    setCurrentStep('analysis');
-    setIsLoading(true);
-
-    simulateTyping(async () => {
-      try {
-        // 1. 저장된 ticker로 2024_ratio 테이블에서 재무비율 데이터 가져오기
-        if (!currentCompanyInfo) {
-          throw new Error('기업 정보가 없습니다.');
-        }
-
-        addMessage({
-          type: 'bot',
-          content: `${data.name}의 재무비율 데이터를 데이터베이스에서 조회 중입니다... 📊`,
-        });
-
-        const ratios = await getFinancialRatiosByTicker(currentCompanyInfo.ticker);
-        
-        if (!ratios) {
-          addMessage({
-            type: 'bot',
-            content: `죄송합니다. "${data.name}" 기업의 재무비율 데이터를 찾을 수 없습니다.\n\n다른 기업명으로 다시 시도해주시거나, 재무 관련 질문을 자유롭게 해주세요.`,
-          });
-          setIsLoading(false);
-          return;
-        }
-
-        // 2. 위험도 평가 (기존 로직 사용)
-        const riskAssessment = assessRisk(ratios, data);
-        
-        // 3. 데이터베이스 저장 부분 제거 - 분석 결과만 표시
-
-        addMessage({
-          type: 'bot',
-          content: '',
-          data: {
-            ratios,
-            riskLevel: riskAssessment.level,
-            riskScore: riskAssessment.score,
-            companyData: data,
-            companyInfo: currentCompanyInfo,
-          },
-        });
-
-        setCurrentStep('complete');
-        setIsLoading(false);
-      } catch (error) {
-        console.error('분석 오류:', error);
-        addMessage({
-          type: 'bot',
-          content: `분석 중 오류가 발생했습니다: ${(error as Error).message}\n\n다시 시도해주세요.`,
-        });
-        setIsLoading(false);
-      }
-    }, 2000);
-  }, [addMessage, simulateTyping, currentCompanyInfo]);
 
   const resetChat = useCallback(() => {
     setMessages([
@@ -301,7 +275,6 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
     isTyping,
     isLoading,
     handleCompanyNameSubmit,
-    handleFinancialDataSubmit,
     handleGeneralChat,
     resetChat,
   };
