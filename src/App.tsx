@@ -13,7 +13,7 @@ function App() {
   const [currentCompanyInfo, setCurrentCompanyInfo] = useState<CompanyInfo | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 2000);
+    const timer = setTimeout(() => setShowSplash(false), 1000);
     return () => clearTimeout(timer);
   }, []);
 

@@ -216,7 +216,7 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
             
             addMessage({
               type: 'bot',
-              content: `✅ ${name}의 재무정보를 성공적으로 불러왔습니다!\n\n분석 결과는 아래와 같습니다.`,
+              content: '',
               data: {
                 ratios,
                 riskLevel: riskAssessment.level,
