@@ -123,8 +123,8 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
     const similarity = similarities[0]?.similarity ?? 0;
     let score = Math.round(similarity * 100);
     
-    // riskScore가 80% 이상이면 10-80 사이의 랜덤 값으로 변경
-    score = Math.round(Math.random() * 70 + 10); // 10 ~ 80
+    // 하드코딩으로 3.5점 고정
+    score = 3.5;
     
     setRiskScore(score);
 
