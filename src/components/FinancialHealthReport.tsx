@@ -173,7 +173,7 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
             </div>
             
             <p className="text-xs text-gray-600 mb-2">{metric.description}</p>
-            <p className="text-xs text-gray-500">{metric.benchmark}</p>
+            {/* <p className="text-xs text-gray-500">{metric.benchmark}</p> */}
           </div>
         ))}
       </div>
@@ -184,19 +184,19 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>
             <span className="text-gray-600">총자산:</span>
-            <span className="font-semibold ml-1">{data.totalAssets.toLocaleString()}억원</span>
+            <span className="font-semibold ml-1">{data.totalAssets.toLocaleString()}</span>
           </div>
           <div>
             <span className="text-gray-600">총부채:</span>
-            <span className="font-semibold ml-1">{data.totalLiabilities.toLocaleString()}억원</span>
+            <span className="font-semibold ml-1">{data.totalLiabilities.toLocaleString()}</span>
           </div>
           <div>
             <span className="text-gray-600">자기자본:</span>
-            <span className="font-semibold ml-1">{data.equity.toLocaleString()}억원</span>
+            <span className="font-semibold ml-1">{data.equity.toLocaleString()}</span>
           </div>
           <div>
             <span className="text-gray-600">매출액:</span>
-            <span className="font-semibold ml-1">{data.revenue.toLocaleString()}억원</span>
+            <span className="font-semibold ml-1">{data.revenue.toLocaleString()}</span>
           </div>
         </div>
       </div>
