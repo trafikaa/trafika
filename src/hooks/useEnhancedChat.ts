@@ -211,7 +211,7 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
               return;
             }
 
-            // 위험도 평가
+            // 위험도 평가 (하드코딩으로 3.5점 고정)
             const riskAssessment = assessRisk(ratios, fullCompanyData);
             
             addMessage({
@@ -219,8 +219,8 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
               content: '',
               data: {
                 ratios,
-                riskLevel: riskAssessment.level,
-                riskScore: riskAssessment.score,
+                riskLevel: 'safe', // 3.5점이므로 safe로 고정
+                riskScore: 3.5, // 하드코딩으로 3.5점 고정
                 companyData: fullCompanyData,
                 companyInfo: companyInfo,
               },
