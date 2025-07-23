@@ -164,7 +164,7 @@ const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">총자산 (억원)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">총자산</label>
             <input
               type="number"
               value={formData.totalAssets}
@@ -174,7 +174,7 @@ const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">총부채 (억원)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">총부채</label>
             <input
               type="number"
               value={formData.totalLiabilities}
@@ -186,7 +186,7 @@ const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">자기자본 (억원)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">자기자본</label>
             <input
               type="number"
               value={formData.equity}
@@ -196,7 +196,7 @@ const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">유동자산 (억원)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">유동자산</label>
             <input
               type="number"
               value={formData.currentAssets}
@@ -208,7 +208,7 @@ const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">유동부채 (억원)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">유동부채</label>
             <input
               type="number"
               value={formData.currentLiabilities}
@@ -218,7 +218,7 @@ const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">매출액 (억원)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">매출액</label>
             <input
               type="number"
               value={formData.revenue}
@@ -230,7 +230,7 @@ const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">순이익 (억원)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">순이익</label>
             <input
               type="number"
               value={formData.netIncome}
@@ -240,7 +240,7 @@ const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">영업현금흐름 (억원)</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">영업현금흐름</label>
             <input
               type="number"
               value={formData.operatingCashFlow}
