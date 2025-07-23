@@ -108,7 +108,7 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
     return { level: 'poor', text: '개선필요', color: 'text-red-600' };
   };
 
-  const overall = overallHealth();
+ // const overall = overallHealth();
 
   const [riskScore, setRiskScore] = useState<number | null>(null);
   const [riskLevel, setRiskLevel] = useState<'safe' | 'caution' | 'danger'>('safe');
@@ -144,10 +144,10 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-xl font-bold text-gray-800">재무건전성 분석 보고서</h3>
-          <div className={`flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 ${overall.color}`}>
+          {/* <div className={`flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 ${overall.color}`}>
             {getScoreIcon(overall.level)}
             <span className="font-semibold">종합평가: {overall.text}</span>
-          </div>
+          </div> */}
         </div>
         
         <div className="text-sm text-gray-600">
@@ -184,19 +184,19 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>
             <span className="text-gray-600">총자산:</span>
-            <span className="font-semibold ml-1">{data.totalAssets.toLocaleString()}원</span>
+            <span className="font-semibold ml-1">{data.totalAssets.toLocaleString()}억 원</span>
           </div>
           <div>
             <span className="text-gray-600">총부채:</span>
-            <span className="font-semibold ml-1">{data.totalLiabilities.toLocaleString()}원</span>
+            <span className="font-semibold ml-1">{data.totalLiabilities.toLocaleString()}억 원</span>
           </div>
           <div>
             <span className="text-gray-600">자기자본:</span>
-            <span className="font-semibold ml-1">{data.equity.toLocaleString()}원</span>
+            <span className="font-semibold ml-1">{data.equity.toLocaleString()}억 원</span>
           </div>
           <div>
             <span className="text-gray-600">매출액:</span>
-            <span className="font-semibold ml-1">{data.revenue.toLocaleString()}원</span>
+            <span className="font-semibold ml-1">{data.revenue.toLocaleString()}억 원</span>
           </div>
         </div>
       </div>

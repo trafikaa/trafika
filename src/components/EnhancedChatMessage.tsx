@@ -63,7 +63,7 @@ const EnhancedChatMessage: React.FC<EnhancedChatMessageProps> = ({ message }) =>
           {message.content}
         </div>
 
-        {/* Fear & Greed Index */}
+        {/* Fear & Greed Index
         {message.data?.riskScore !== undefined && message.data?.riskLevel && (
           <div className="mb-6">
             <FearGreedIndex 
@@ -71,7 +71,7 @@ const EnhancedChatMessage: React.FC<EnhancedChatMessageProps> = ({ message }) =>
               level={message.data.riskLevel} 
             />
           </div>
-        )}
+        )} */}
 
         {/* 재무건전성 보고서 */}
         {message.data?.ratios && message.data?.companyData && message.data?.companyInfo && (
