@@ -159,7 +159,7 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
           // 2. DB에 없으면 일반 질문으로 처리
           addMessage({
             type: 'bot',
-            content: `"${name}" 기업을 데이터베이스에서 찾을 수 없습니다.\n\n일반적인 질문으로 처리하겠습니다.`,
+            content: `"${cleanName}" 기업을 데이터베이스에서 찾을 수 없습니다.\n\n일반적인 질문으로 처리하겠습니다.`,
           });
           
           // ChatGPT로 일반 질문 처리
@@ -173,7 +173,7 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
         simulateTyping(async () => {
           addMessage({
             type: 'bot',
-            content: `${name}의 최신 재무정보를 다트(DART)에서 불러오는 중입니다... 📊`,
+            content: `${cleanName}의 최신 재무정보를 다트(DART)에서 불러오는 중입니다... 📊`,
           });
 
           // corp_code를 사용하여 DART API에서 재무제표 데이터 가져오기
@@ -182,7 +182,7 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
           if (!financialData) {
             addMessage({
               type: 'bot',
-              content: `죄송합니다. "${name}" 기업의 재무정보를 불러올 수 없습니다.\n\n다른 기업명으로 다시 시도해주시거나, 재무 관련 질문을 자유롭게 해주세요.`,
+              content: `죄송합니다. "${cleanName}" 기업의 재무정보를 불러올 수 없습니다.\n\n다른 기업명으로 다시 시도해주시거나, 재무 관련 질문을 자유롭게 해주세요.`,
             });
             setIsLoading(false);
             return;
@@ -200,7 +200,7 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
           try {
             addMessage({
               type: 'bot',
-              content: `${name}의 재무비율 데이터를 데이터베이스에서 조회 중입니다... 📊`,
+              content: `${cleanName}의 재무비율 데이터를 데이터베이스에서 조회 중입니다... 📊`,
             });
 
             const ratios = await getFinancialRatiosByTicker(companyInfo.ticker);
@@ -208,7 +208,7 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
             if (!ratios) {
               addMessage({
                 type: 'bot',
-                content: `죄송합니다. "${name}" 기업의 재무비율 데이터를 찾을 수 없습니다.\n\n다른 기업명으로 다시 시도해주시거나, 재무 관련 질문을 자유롭게 해주세요.`,
+                content: `죄송합니다. "${cleanName}" 기업의 재무비율 데이터를 찾을 수 없습니다.\n\n다른 기업명으로 다시 시도해주시거나, 재무 관련 질문을 자유롭게 해주세요.`,
               });
               setIsLoading(false);
               return;
@@ -247,7 +247,7 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
         });
         
         // 오류 발생 시에도 ChatGPT로 처리
-        await handleGeneralChat(name);
+        await handleGeneralChat(cleanName);
       }
     }, 1000);
   }, [addMessage, simulateTyping, handleGeneralChat]);
