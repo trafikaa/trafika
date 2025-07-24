@@ -163,7 +163,7 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
           });
           
           // ChatGPT로 일반 질문 처리
-          await handleGeneralChat(name);
+          await handleGeneralChat(cleanName);
           return;
         }
 
@@ -189,7 +189,7 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
           }
 
           const fullCompanyData: CompanyData = {
-            name: name,
+            name: cleanName,
             ...financialData
           };
 
