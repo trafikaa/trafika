@@ -49,4 +49,4 @@ export interface ChatMessage {
   data?: ChatMessageData; 
 }
 
-export type ChatStep = 'welcome' | 'company-name' | 'financial-data' | 'analysis' | 'complete' | 'chat';
+export type ChatStep = 'welcome' | 'company-name' | 'analysis' | 'complete' | 'chat';

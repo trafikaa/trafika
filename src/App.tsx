@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Bot, TrendingDown, RefreshCw, Database } from 'lucide-react';
 import EnhancedChatMessage from './components/EnhancedChatMessage';
-import UnifiedFinancialForm from './components/UnifiedFinancialForm';
+// import UnifiedFinancialForm from './components/UnifiedFinancialForm';
 import TypingIndicator from './components/TypingIndicator';
 import SplashScreen from './components/SplashScreen';
 import { useEnhancedChat } from './hooks/useEnhancedChat';
@@ -13,7 +13,7 @@ function App() {
   const [currentCompanyInfo, setCurrentCompanyInfo] = useState<CompanyInfo | null>(null);
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 2000);
+    const timer = setTimeout(() => setShowSplash(false), 1000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -26,7 +26,6 @@ function App() {
     isTyping,
     isLoading,
     handleCompanyNameSubmit,
-    handleFinancialDataSubmit,
     handleGeneralChat,
     resetChat,
   } = useEnhancedChat(currentCompanyInfo);
@@ -108,17 +107,6 @@ function App() {
                   {isLoading ? '처리 중...' : '전송'}
                 </button>
               </form>
-            )}
-
-            {currentStep === 'financial-data' && (
-              <div className="flex justify-center">
-                <UnifiedFinancialForm 
-                  onSubmit={handleFinancialDataSubmit}
-                  onCompanyInfoChange={setCurrentCompanyInfo}
-                  companyName={companyName}
-                  initialData={companyData}
-                />
-              </div>
             )}
 
             {currentStep === 'complete' && (
