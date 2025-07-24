@@ -62,7 +62,7 @@ const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({
       setLoading(true);
       setError(null);
       try {
-        const companyInfo = await getCompanyInfoByName(formData.name.trim());
+        const companyInfo = await getCompanyInfoByName(formData.name.replace(/\s+/g, '').toUpperCase());
         console.log('Supabase companyInfo:', companyInfo);
         if (!companyInfo) {
           setAutoFilled(false);
@@ -103,7 +103,7 @@ const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({
   const handleInputChange = (field: keyof CompanyData, value: string) => {
     setFormData(prev => ({
       ...prev,
-      [field]: field === 'name' ? value.trim().toUpperCase() : Number(value)
+      [field]: field === 'name' ? value : Number(value)
     }));
     if (field === 'name') setAutoFilled(false); // 이름 바꾸면 자동채움 해제
   };
@@ -111,7 +111,10 @@ const UnifiedFinancialForm: React.FC<UnifiedFinancialFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('분석 시작하기 클릭, formData:', formData);
-    onSubmit(formData as CompanyData);
+    onSubmit({
+      ...formData,
+      name: formData.name.replace(/\s+/g, '').toUpperCase()
+    } as CompanyData);
   };
 
   const resetForm = () => {

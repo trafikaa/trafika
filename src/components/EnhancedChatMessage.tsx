@@ -98,7 +98,7 @@ const EnhancedChatMessage: React.FC<EnhancedChatMessageProps> = ({ message }) =>
           </div>
         )}
         
-        <div className="text-xs text-gray-500 mt-2">
+        <div className={`text-xs mt-2 ${isBot ? 'text-gray-500' : 'text-sky-400'}`}>
           {message.timestamp.toLocaleTimeString('ko-KR', { 
             hour: '2-digit', 
             minute: '2-digit' 
