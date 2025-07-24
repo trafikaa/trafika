@@ -134,12 +134,15 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
   }, [messages, addMessage, simulateTyping, companyData]);
 
   const handleCompanyNameSubmit = useCallback(async (name: string) => {
+    // 입력값 정제
+    const cleanName = name.trim().toUpperCase();
+
     addMessage({
       type: 'user',
       content: name,
     });
 
-    setCompanyName(name);
+    setCompanyName(cleanName);
     setIsLoading(true);
 
     simulateTyping(async () => {
@@ -147,10 +150,10 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
         // 1. 우선 DB에서 기업 정보 검색 (corp_code와 ticker 모두)
         addMessage({
           type: 'bot',
-          content: `${name} 기업을 데이터베이스에서 검색 중입니다... 🔍`,
+          content: `${cleanName} 기업을 데이터베이스에서 검색 중입니다... 🔍`,
         });
 
-        const companyInfo = await getCompanyInfoByName(name);
+        const companyInfo = await getCompanyInfoByName(cleanName);
         
         if (!companyInfo) {
           // 2. DB에 없으면 일반 질문으로 처리
