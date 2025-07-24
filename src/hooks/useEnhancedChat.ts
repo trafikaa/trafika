@@ -139,7 +139,7 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
 
     addMessage({
       type: 'user',
-      content: name,
+      content: cleanName,
     });
 
     setCompanyName(cleanName);
