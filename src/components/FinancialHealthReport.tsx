@@ -58,7 +58,7 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
       title: '자기자본비율',
       value: ratios.equity_ratio,
       unit: '%',
-      description: '자기자본 / 총자산',
+      description: '= 자기자본 / 총자산',
       health: getHealthScore(ratios.equity_ratio, { good: 50, fair: 30 }),
       icon: <TrendingUp className="w-5 h-5" />,
       benchmark: '50% 이상 우수, 30% 이상 양호'
@@ -67,7 +67,7 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
       title: '총자산수익률(ROA)',
       value: ratios.ROA,
       unit: '%',
-      description: '순이익 / 총자산',
+      description: '= 순이익 / 총자산',
       health: getHealthScore(ratios.ROA, { good: 5, fair: 2 }),
       icon: <TrendingUp className="w-5 h-5" />,
       benchmark: '5% 이상 우수, 2% 이상 양호'
@@ -76,7 +76,7 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
       title: '자기자본수익률(ROE)',
       value: ratios.ROE,
       unit: '%',
-      description: '순이익 / 자기자본',
+      description: '= 순이익 / 자기자본',
       health: getHealthScore(ratios.ROE, { good: 15, fair: 10 }),
       icon: <TrendingUp className="w-5 h-5" />,
       benchmark: '15% 이상 우수, 10% 이상 양호'
@@ -85,7 +85,7 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
       title: '영업이익률',
       value: ratios.operating_margin_on_total_assets,
       unit: '%',
-      description: '영업이익 / 총자산',
+      description: '= 영업이익 / 총자산',
       health: getHealthScore(ratios.operating_margin_on_total_assets, { good: 10, fair: 5 }),
       icon: <DollarSign className="w-5 h-5" />,
       benchmark: '10% 이상 우수, 5% 이상 양호'
