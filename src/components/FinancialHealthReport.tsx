@@ -181,32 +181,38 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
       {/* 재무 요약 */}
       <div className="bg-gray-50 rounded-lg p-4">
         <h4 className="font-semibold text-gray-800 mb-3">재무 현황 요약 (2024년 기준) </h4>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <div>
+        
+        {/* 첫 번째 줄: 자산총계, 부채총계, 자본총계 */}
+        <div className="grid grid-cols-3 gap-4 text-sm mb-4">
+          <div className="whitespace-nowrap">
             <span className="text-gray-600">자산총계:</span>
             <span className="font-semibold ml-1">{data.totalAssets !== null && data.totalAssets !== undefined ? data.totalAssets.toLocaleString() : 'N/A'}원</span>
           </div>
-          <div>
+          <div className="whitespace-nowrap">
             <span className="text-gray-600">부채총계:</span>
             <span className="font-semibold ml-1">{data.totalLiabilities !== null && data.totalLiabilities !== undefined ? data.totalLiabilities.toLocaleString() : 'N/A'}원</span>
           </div>
-          <div>
+          <div className="whitespace-nowrap">
             <span className="text-gray-600">자본총계:</span>
             <span className="font-semibold ml-1">{data.equity !== null && data.equity !== undefined ? data.equity.toLocaleString() : 'N/A'}원</span>
           </div>
-          <div>
+        </div>
+        
+        {/* 두 번째 줄: 매출액, 영업이익, 당기순이익, 영업현금흐름 */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div className="whitespace-nowrap">
             <span className="text-gray-600">매출액:</span>
             <span className="font-semibold ml-1">{data.revenue !== null && data.revenue !== undefined ? data.revenue.toLocaleString() : 'N/A'}원</span>
           </div>
-          <div>
+          <div className="whitespace-nowrap">
             <span className="text-gray-600">영업이익:</span>
             <span className="font-semibold ml-1">{data.operatingIncome !== null && data.operatingIncome !== undefined ? data.operatingIncome.toLocaleString() : 'N/A'}원</span>
           </div>
-          <div>
+          <div className="whitespace-nowrap">
             <span className="text-gray-600">당기순이익:</span>
             <span className="font-semibold ml-1">{data.netIncome !== null && data.netIncome !== undefined ? data.netIncome.toLocaleString() : 'N/A'}원</span>
           </div>
-          <div>
+          <div className="whitespace-nowrap">
             <span className="text-gray-600">영업현금흐름:</span>
             <span className="font-semibold ml-1">{data.operatingCashFlow !== null && data.operatingCashFlow !== undefined ? data.operatingCashFlow.toLocaleString() : 'N/A'}원</span>
           </div>
