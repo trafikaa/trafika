@@ -222,10 +222,12 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
       <div className="mt-6 p-4 bg-blue-50 rounded-lg">
         <h4 className="font-semibold text-blue-800 mb-2">💡 재무건전성 개선 권장사항</h4>
         <ul className="text-sm text-blue-700 space-y-1">
-          {ratios.debt_ratio && ratios.debt_ratio > 50 && <li>• 부채비율 개선을 위한 부채 축소 및 자기자본 확충 필요</li>}
-          {ratios.current_ratio && ratios.current_ratio < 1.5 && <li>• 단기 유동성 개선을 위한 유동자산 증대 권장</li>}
-                      {ratios.revenue_growth && ratios.revenue_growth < 5 && <li>• 매출 증대를 위한 사업 전략 수립 필요</li>}
-          {ratios.ROE && ratios.ROE < 10 && <li>• 자기자본 수익률 향상을 위한 사업 효율성 개선 권장</li>}
+          {ratios.debt_ratio && ratios.debt_ratio > 200 && <li>• 부채비율 개선을 위한 부채 축소 및 자기자본 확충 필요</li>}
+          {ratios.current_ratio && ratios.current_ratio < 100 && <li>• 단기 유동성 개선을 위한 유동자산 증대 권장</li>}
+          {ratios.equity_ratio && ratios.equity_ratio < 30 && <li>• 자기자본비율 개선을 위한 자본 확충 필요</li>}
+          {ratios.revenue_growth && ratios.revenue_growth < 0 && <li>• 매출 증대를 위한 사업 전략 수립 필요</li>}
+          {ratios.ROE && ratios.ROE < 5 && <li>• 자기자본 수익률 향상을 위한 사업 효율성 개선 권장</li>}
+          {ratios.operating_margin_on_total_assets && ratios.operating_margin_on_total_assets < 10 && <li>• 영업이익률 개선을 위한 영업 효율성 제고 필요</li>}
           {data.operatingCashFlow < 0 && <li>• 영업현금흐름 개선을 위한 운영 효율성 제고 필요</li>}
         </ul>
       </div>
