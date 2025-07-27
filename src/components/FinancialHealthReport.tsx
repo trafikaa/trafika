@@ -48,7 +48,7 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
     {
       title: '유동비율',
       value: ratios.current_ratio,
-      unit: '',
+      unit: '%',
       description: '유동자산 / 유동부채',
       health: getHealthScore(ratios.current_ratio, { good: 2.0, fair: 1.5 }),
       icon: <DollarSign className="w-5 h-5" />,
@@ -184,31 +184,31 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>
             <span className="text-gray-600">자산총계:</span>
-            <span className="font-semibold ml-1">{data.totalAssets !== null && data.totalAssets !== undefined ? data.totalAssets.toLocaleString() : 'N/A'}억 원</span>
+            <span className="font-semibold ml-1">{data.totalAssets !== null && data.totalAssets !== undefined ? data.totalAssets.toLocaleString() : 'N/A'}원</span>
           </div>
           <div>
             <span className="text-gray-600">부채총계:</span>
-            <span className="font-semibold ml-1">{data.totalLiabilities !== null && data.totalLiabilities !== undefined ? data.totalLiabilities.toLocaleString() : 'N/A'}억 원</span>
+            <span className="font-semibold ml-1">{data.totalLiabilities !== null && data.totalLiabilities !== undefined ? data.totalLiabilities.toLocaleString() : 'N/A'}원</span>
           </div>
           <div>
             <span className="text-gray-600">자본총계:</span>
-            <span className="font-semibold ml-1">{data.equity !== null && data.equity !== undefined ? data.equity.toLocaleString() : 'N/A'}억 원</span>
+            <span className="font-semibold ml-1">{data.equity !== null && data.equity !== undefined ? data.equity.toLocaleString() : 'N/A'}원</span>
           </div>
           <div>
             <span className="text-gray-600">매출액:</span>
-            <span className="font-semibold ml-1">{data.revenue !== null && data.revenue !== undefined ? data.revenue.toLocaleString() : 'N/A'}억 원</span>
+            <span className="font-semibold ml-1">{data.revenue !== null && data.revenue !== undefined ? data.revenue.toLocaleString() : 'N/A'}원</span>
           </div>
           <div>
             <span className="text-gray-600">영업이익:</span>
-            <span className="font-semibold ml-1">{data.operatingIncome !== null && data.operatingIncome !== undefined ? data.operatingIncome.toLocaleString() : 'N/A'}억 원</span>
+            <span className="font-semibold ml-1">{data.operatingIncome !== null && data.operatingIncome !== undefined ? data.operatingIncome.toLocaleString() : 'N/A'}원</span>
           </div>
           <div>
             <span className="text-gray-600">당기순이익:</span>
-            <span className="font-semibold ml-1">{data.netIncome !== null && data.netIncome !== undefined ? data.netIncome.toLocaleString() : 'N/A'}억 원</span>
+            <span className="font-semibold ml-1">{data.netIncome !== null && data.netIncome !== undefined ? data.netIncome.toLocaleString() : 'N/A'}원</span>
           </div>
           <div>
             <span className="text-gray-600">영업현금흐름:</span>
-            <span className="font-semibold ml-1">{data.operatingCashFlow !== null && data.operatingCashFlow !== undefined ? data.operatingCashFlow.toLocaleString() : 'N/A'}억 원</span>
+            <span className="font-semibold ml-1">{data.operatingCashFlow !== null && data.operatingCashFlow !== undefined ? data.operatingCashFlow.toLocaleString() : 'N/A'}원</span>
           </div>
         </div>
       </div>
