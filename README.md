@@ -82,8 +82,11 @@ trafika/
 ├── src/
 │   ├── components/          # React 컴포넌트
 │   │   ├── FinancialHealthReport.tsx  # 재무건전성 보고서
-│   │   ├── EnhancedChatMessage.tsx    # 채팅 메시지
-│   │   └── ...
+│   │   ├── EnhancedChatMessage.tsx    # 향상된 채팅 메시지
+│   │   ├── ChatMessage.tsx            # 기본 채팅 메시지
+│   │   ├── TypingIndicator.tsx        # 타이핑 표시기
+│   │   ├── SplashScreen.tsx           # 스플래시 화면
+│   │   └── FearGreedIndex.tsx        # 공포/탐욕 지수 (주석처리됨)
 │   ├── services/           # API 서비스
 │   │   ├── companyService.ts    # 기업 데이터 서비스
 │   │   ├── chatgptApi.ts       # ChatGPT API
@@ -108,6 +111,11 @@ trafika/
 재무비율이 포함된 구조화된 채팅 메시지를 표시하는 컴포넌트입니다.
 - 재무 데이터 시각화
 - 사용자 친화적 인터페이스
+
+### ChatMessage
+기본 텍스트 채팅 메시지를 표시하는 컴포넌트입니다.
+- 일반 대화 메시지 처리
+- 간단한 텍스트 표시
 
 ## AI 챗봇 기능
 
