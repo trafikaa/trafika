@@ -143,7 +143,7 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
     <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl mx-auto">
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-bold text-gray-800">재무건전성 분석 보고서</h3>
+          <h3 className="text-xl font-bold text-gray-800">재무 분석 보고서</h3>
           {/* <div className={`flex items-center gap-2 px-3 py-1 rounded-full bg-gray-100 ${overall.color}`}>
             {getScoreIcon(overall.level)}
             <span className="font-semibold">종합평가: {overall.text}</span>
@@ -198,8 +198,8 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
           </div>
         </div>
         
-        {/* 두 번째 줄: 매출액, 영업이익, 당기순이익, 영업현금흐름 */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+        {/* 두 번째 줄: 매출액, 영업이익, 당기순이익 */}
+        <div className="grid grid-cols-3 gap-4 text-sm">
           <div className="whitespace-nowrap">
             <span className="text-gray-600">매출액:</span>
             <span className="font-semibold ml-1">{data.revenue !== null && data.revenue !== undefined ? data.revenue.toLocaleString() : 'N/A'}원</span>
@@ -211,10 +211,6 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
           <div className="whitespace-nowrap">
             <span className="text-gray-600">당기순이익:</span>
             <span className="font-semibold ml-1">{data.netIncome !== null && data.netIncome !== undefined ? data.netIncome.toLocaleString() : 'N/A'}원</span>
-          </div>
-          <div className="whitespace-nowrap">
-            <span className="text-gray-600">영업현금흐름:</span>
-            <span className="font-semibold ml-1">{data.operatingCashFlow !== null && data.operatingCashFlow !== undefined ? data.operatingCashFlow.toLocaleString() : 'N/A'}원</span>
           </div>
         </div>
       </div>
