@@ -16,21 +16,21 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
     if (value === null) return { score: 'unknown', color: 'text-gray-600', bg: 'bg-gray-50' };
     
     if (isHigherBetter) {
-      if (value >= thresholds.good) return { score: 'good', color: 'text-green-600', bg: 'bg-green-50' };
-      if (value >= thresholds.fair) return { score: 'fair', color: 'text-yellow-600', bg: 'bg-yellow-50' };
-      return { score: 'poor', color: 'text-red-600', bg: 'bg-red-50' };
+      if (value >= thresholds.good) return { score: 'good', color: 'text-blue-600', bg: 'bg-blue-50' };
+      if (value >= thresholds.fair) return { score: 'fair', color: 'text-green-500', bg: 'bg-green-50' };
+      return { score: 'poor', color: 'text-orange-600', bg: 'bg-orange-50' };
     } else {
-      if (value <= thresholds.good) return { score: 'good', color: 'text-green-600', bg: 'bg-green-50' };
-      if (value <= thresholds.fair) return { score: 'fair', color: 'text-yellow-600', bg: 'bg-yellow-50' };
-      return { score: 'poor', color: 'text-red-600', bg: 'bg-red-50' };
+      if (value <= thresholds.good) return { score: 'good', color: 'text-blue-600', bg: 'bg-blue-50' };
+      if (value <= thresholds.fair) return { score: 'fair', color: 'text-green-500', bg: 'bg-green-50' };
+      return { score: 'poor', color: 'text-orange-600', bg: 'bg-orange-50' };
     }
   };
 
   const getScoreIcon = (score: string) => {
     switch (score) {
       case 'good': return <CheckCircle className="w-5 h-5" />;
-      case 'fair': return <AlertTriangle className="w-5 h-5" />;
-      case 'poor': return <TrendingDown className="w-5 h-5" />;
+      case 'fair': return <CheckCircle className="w-5 h-5" />;
+      case 'poor': return <AlertTriangle className="w-5 h-5" />;
       default: return <TrendingUp className="w-5 h-5" />;
     }
   };
