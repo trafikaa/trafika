@@ -41,18 +41,18 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
       value: ratios.debt_ratio,
       unit: '%',
       description: '총부채 / 총자산',
-      health: getHealthScore(ratios.debt_ratio, { good: 30, fair: 50 }, false),
+      health: getHealthScore(ratios.debt_ratio, { good: 100, fair: 200 }, false),
       icon: <Shield className="w-5 h-5" />,
-      benchmark: '30% 이하 우수, 50% 이하 양호'
+      benchmark: '100% 이하 우수, 200% 이하 양호'
     },
     {
       title: '유동비율',
       value: ratios.current_ratio,
       unit: '%',
       description: '유동자산 / 유동부채',
-      health: getHealthScore(ratios.current_ratio, { good: 2.0, fair: 1.5 }),
+      health: getHealthScore(ratios.current_ratio, { good: 150, fair: 100 }),
       icon: <DollarSign className="w-5 h-5" />,
-      benchmark: '2.0 이상 우수, 1.5 이상 양호'
+      benchmark: '150% 이상 우수, 100% 이상 양호'
     },
     {
       title: '자기자본비율',
@@ -68,18 +68,18 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
       value: ratios.revenue_growth,
       unit: '%',
       description: '전년 대비 매출액 증가율',
-      health: getHealthScore(ratios.revenue_growth, { good: 10, fair: 5 }),
+      health: getHealthScore(ratios.revenue_growth, { good: 10, fair: 0 }),
       icon: <TrendingUp className="w-5 h-5" />,
-      benchmark: '10% 이상 우수, 5% 이상 양호'
+      benchmark: '10% 이상 우수, 0% 이상 양호'
     },
     {
       title: '자기자본수익률(ROE)',
       value: ratios.ROE,
       unit: '%',
       description: '순이익 / 자기자본',
-      health: getHealthScore(ratios.ROE, { good: 15, fair: 10 }),
+      health: getHealthScore(ratios.ROE, { good: 10, fair: 5 }),
       icon: <TrendingUp className="w-5 h-5" />,
-      benchmark: '15% 이상 우수, 10% 이상 양호'
+      benchmark: '10% 이상 우수, 5% 이상 양호'
     },
     {
       title: '영업이익률',
