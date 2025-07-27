@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { FinancialRatios, CompanyData, CompanyInfo } from '../types';
 import { TrendingUp, TrendingDown, DollarSign, Shield, AlertTriangle, CheckCircle } from 'lucide-react';
-import FearGreedIndex from './FearGreedIndex';
-import { fetchRiskSimilarity } from '../services/similarityApi';
-import { useState } from 'react';
+// import FearGreedIndex from './FearGreedIndex';
+// import { fetchRiskSimilarity } from '../services/similarityApi';
+// import { useState } from 'react';
 
 interface FinancialHealthReportProps {
   ratios: FinancialRatios;
@@ -108,8 +108,10 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
     return { level: 'poor', text: '개선필요', color: 'text-red-600' };
   };
 
- // const overall = overallHealth();
+   // const overall = overallHealth();
 
+  // 부실 위험도 지수 관련 코드 - 주석처리됨
+  /*
   const [riskScore, setRiskScore] = useState<number | null>(null);
   const [riskLevel, setRiskLevel] = useState<'safe' | 'caution' | 'danger'>('safe');
   const [similarCases, setSimilarCases] = useState<any[]>([]);
@@ -138,6 +140,7 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
       handleAnalyze(companyInfo);
     }
   }, [companyInfo]);
+  */
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl mx-auto">
@@ -227,25 +230,24 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
         </ul>
       </div>
 
-      {/* 부실 위험도 지수 */}
+      {/* 부실 위험도 지수 - 주석처리됨 */}
+      {/* 
       <div className="mt-6 p-4 bg-purple-50 rounded-lg">
         <h4 className="font-semibold text-purple-800 mb-2">💡 부실 위험도 지수</h4>
         <FearGreedIndex score={riskScore ?? 0} level={riskLevel} />
 
-        {/* 유사 부실기업 정보 추가 */}
-        {similarCases.length > 0 && (
-          <div className="mt-4">
-            <div className="font-semibold text-purple-700 mb-1">가장 유사한 과거 부실기업</div>
-            <ul className="text-sm text-purple-800 space-y-1">
-              {similarCases.map((item, idx) => (
-                <li key={idx}>
-                  • {item.ticker} ({item.year}) - 유사도: {(item.similarity * 100).toFixed(1)}%
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <div className="mt-4">
+          <div className="font-semibold text-purple-700 mb-1">가장 유사한 과거 부실기업</div>
+          <ul className="text-sm text-purple-800 space-y-1">
+            {similarCases.map((item, idx) => (
+              <li key={idx}>
+                • {item.ticker} ({item.year}) - 유사도: {(item.similarity * 100).toFixed(1)}%
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
+      */}
     </div>
   );
 };
