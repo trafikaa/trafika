@@ -1,9 +1,9 @@
 import { useState, useCallback } from 'react';
 import { ChatMessage, ChatStep, CompanyData, FinancialRatios } from '../types';
 import { assessRisk } from '../utils/financialAnalysis';
-import { dartApi } from '../services/dartApi';
+// import { dartApi } from '../services/dartApi';
 //import { riskDatabase } from '../services/riskDatabase';
-import { getCompanyInfoByName, getFinancialRatiosByTicker, CompanyInfo } from '../services/companyService';
+import { getCompanyInfoByName, getFinancialRatiosByTicker, getFinancialDataByTicker, CompanyInfo } from '../services/companyService';
 import { chatgptApi } from '../services/chatgptApi';
 
 export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
@@ -11,7 +11,7 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
     {
       id: '1',
       type: 'bot',
-      content: '안녕하세요! 공시 데이터를 기반으로 기업의 재무 상태를 분석해드리는 챗봇입니다. 🏢\n\n기업명을 입력하시면 데이터베이스에서 기업 코드를 찾고, 다트(DART)에서 최신 재무정보를 자동으로 불러와 분석해드립니다.\n\n또한 재무 관련 질문이나 다른 궁금한 점이 있으시면 언제든지 물어보세요!',
+      content: '안녕하세요! 고도화된 부실기업 경고 시스템입니다. 🏢\n\n기업명을 입력하시면 데이터베이스에서 기업 코드를 찾고, 다트(DART)에서 최신 재무정보를 자동으로 불러와 분석해드립니다.\n\n또한 재무 관련 질문이나 다른 궁금한 점이 있으시면 언제든지 물어보세요!',
       timestamp: new Date(),
     }
   ]);
@@ -68,11 +68,12 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
           financialSummary += `\n\n[현재 기업: ${companyData.name}]`;
           financialSummary += `\n- 자산총계: ${companyData.totalAssets}`;
           financialSummary += `\n- 부채총계: ${companyData.totalLiabilities}`;
-          financialSummary += `\n- 자기자본: ${companyData.equity}`;
+          financialSummary += `\n- 자본총계: ${companyData.equity}`;
           financialSummary += `\n- 유동자산: ${companyData.currentAssets}`;
           financialSummary += `\n- 유동부채: ${companyData.currentLiabilities}`;
-          financialSummary += `\n- 매출: ${companyData.revenue}`;
-          financialSummary += `\n- 순이익: ${companyData.netIncome}`;
+          financialSummary += `\n- 매출액: ${companyData.revenue}`;
+          financialSummary += `\n- 영업이익: ${companyData.operatingIncome}`;
+          financialSummary += `\n- 당기순이익: ${companyData.netIncome}`;
           financialSummary += `\n- 영업현금흐름: ${companyData.operatingCashFlow}`;
         }
         // 가장 최근 메시지의 ratios를 찾아 요약
@@ -134,15 +135,12 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
   }, [messages, addMessage, simulateTyping, companyData]);
 
   const handleCompanyNameSubmit = useCallback(async (name: string) => {
-    // 입력값 정제
-    const cleanName = name.trim().toUpperCase();
-
     addMessage({
       type: 'user',
-      content: cleanName,
+      content: name,
     });
 
-    setCompanyName(cleanName);
+    setCompanyName(name);
     setIsLoading(true);
 
     simulateTyping(async () => {
@@ -150,20 +148,20 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
         // 1. 우선 DB에서 기업 정보 검색 (corp_code와 ticker 모두)
         addMessage({
           type: 'bot',
-          content: `${cleanName} 기업을 데이터베이스에서 검색 중입니다... 🔍`,
+          content: `${name} 기업을 데이터베이스에서 검색 중입니다... 🔍`,
         });
 
-        const companyInfo = await getCompanyInfoByName(cleanName);
+        const companyInfo = await getCompanyInfoByName(name);
         
         if (!companyInfo) {
           // 2. DB에 없으면 일반 질문으로 처리
           addMessage({
             type: 'bot',
-            content: `"${cleanName}" 기업을 데이터베이스에서 찾을 수 없습니다.\n\n일반적인 질문으로 처리하겠습니다.`,
+            content: `"${name}" 기업을 데이터베이스에서 찾을 수 없습니다.\n\n일반적인 질문으로 처리하겠습니다.`,
           });
           
           // ChatGPT로 일반 질문 처리
-          await handleGeneralChat(cleanName);
+          await handleGeneralChat(name);
           return;
         }
 
@@ -173,23 +171,23 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
         simulateTyping(async () => {
           addMessage({
             type: 'bot',
-            content: `${cleanName}의 최신 재무정보를 다트(DART)에서 불러오는 중입니다... 📊`,
+            content: `${name}의 재무정보를 데이터베이스에서 불러오는 중입니다... 📊`,
           });
 
-          // corp_code를 사용하여 DART API에서 재무제표 데이터 가져오기
-          const financialData = await dartApi.getFinancialStatement(companyInfo.corp_code);
+          // Supabase에서 재무 데이터 가져오기
+          const financialData = await getFinancialDataByTicker(companyInfo.ticker);
           
           if (!financialData) {
             addMessage({
               type: 'bot',
-              content: `죄송합니다. "${cleanName}" 기업의 재무정보를 불러올 수 없습니다.\n\n다른 기업명으로 다시 시도해주시거나, 재무 관련 질문을 자유롭게 해주세요.`,
+              content: `죄송합니다. "${name}" 기업의 재무정보를 불러올 수 없습니다.\n\n다른 기업명으로 다시 시도해주시거나, 재무 관련 질문을 자유롭게 해주세요.`,
             });
             setIsLoading(false);
             return;
           }
 
           const fullCompanyData: CompanyData = {
-            name: cleanName,
+            name: name,
             ...financialData
           };
 
@@ -200,7 +198,7 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
           try {
             addMessage({
               type: 'bot',
-              content: `${cleanName}의 재무비율 데이터를 데이터베이스에서 조회 중입니다... 📊`,
+              content: `${name}의 재무비율 데이터를 데이터베이스에서 조회 중입니다... 📊`,
             });
 
             const ratios = await getFinancialRatiosByTicker(companyInfo.ticker);
@@ -208,22 +206,22 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
             if (!ratios) {
               addMessage({
                 type: 'bot',
-                content: `죄송합니다. "${cleanName}" 기업의 재무비율 데이터를 찾을 수 없습니다.\n\n다른 기업명으로 다시 시도해주시거나, 재무 관련 질문을 자유롭게 해주세요.`,
+                content: `죄송합니다. "${name}" 기업의 재무비율 데이터를 찾을 수 없습니다.\n\n다른 기업명으로 다시 시도해주시거나, 재무 관련 질문을 자유롭게 해주세요.`,
               });
               setIsLoading(false);
               return;
             }
 
-            // 위험도 평가 (하드코딩으로 3.5점 고정)
+            // 위험도 평가
             const riskAssessment = assessRisk(ratios, fullCompanyData);
             
             addMessage({
               type: 'bot',
-              content: '',
+              content: `✅ ${name}의 재무정보를 성공적으로 불러왔습니다!\n\n분석 결과는 아래와 같습니다.`,
               data: {
                 ratios,
-                riskLevel: 'safe', // 3.5점이므로 safe로 고정
-                riskScore: 3.5, // 하드코딩으로 3.5점 고정
+                riskLevel: riskAssessment.level,
+                riskScore: riskAssessment.score,
                 companyData: fullCompanyData,
                 companyInfo: companyInfo,
               },
@@ -247,7 +245,7 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
         });
         
         // 오류 발생 시에도 ChatGPT로 처리
-        await handleGeneralChat(cleanName);
+        await handleGeneralChat(name);
       }
     }, 1000);
   }, [addMessage, simulateTyping, handleGeneralChat]);

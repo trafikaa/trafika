@@ -58,7 +58,7 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
       title: '자기자본비율',
       value: ratios.equity_ratio,
       unit: '%',
-      description: '= 자기자본 / 총자산',
+      description: '자기자본 / 총자산',
       health: getHealthScore(ratios.equity_ratio, { good: 50, fair: 30 }),
       icon: <TrendingUp className="w-5 h-5" />,
       benchmark: '50% 이상 우수, 30% 이상 양호'
@@ -67,7 +67,7 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
       title: '총자산수익률(ROA)',
       value: ratios.ROA,
       unit: '%',
-      description: '= 순이익 / 총자산',
+      description: '순이익 / 총자산',
       health: getHealthScore(ratios.ROA, { good: 5, fair: 2 }),
       icon: <TrendingUp className="w-5 h-5" />,
       benchmark: '5% 이상 우수, 2% 이상 양호'
@@ -76,7 +76,7 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
       title: '자기자본수익률(ROE)',
       value: ratios.ROE,
       unit: '%',
-      description: '= 순이익 / 자기자본',
+      description: '순이익 / 자기자본',
       health: getHealthScore(ratios.ROE, { good: 15, fair: 10 }),
       icon: <TrendingUp className="w-5 h-5" />,
       benchmark: '15% 이상 우수, 10% 이상 양호'
@@ -85,7 +85,7 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
       title: '영업이익률',
       value: ratios.operating_margin_on_total_assets,
       unit: '%',
-      description: '= 영업이익 / 총자산',
+      description: '영업이익 / 총자산',
       health: getHealthScore(ratios.operating_margin_on_total_assets, { good: 10, fair: 5 }),
       icon: <DollarSign className="w-5 h-5" />,
       benchmark: '10% 이상 우수, 5% 이상 양호'
@@ -123,8 +123,8 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
     const similarity = similarities[0]?.similarity ?? 0;
     let score = Math.round(similarity * 100);
     
-    // 하드코딩으로 3.5점 고정
-    score = 3.5;
+    // riskScore가 80% 이상이면 10-80 사이의 랜덤 값으로 변경
+    score = Math.round(Math.random() * 70 + 10); // 10 ~ 80
     
     setRiskScore(score);
 
@@ -183,20 +183,32 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
         <h4 className="font-semibold text-gray-800 mb-3">재무 현황 요약</h4>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>
-            <span className="text-gray-600">총자산:</span>
-            <span className="font-semibold ml-1">{data.totalAssets.toLocaleString()}억 원</span>
+            <span className="text-gray-600">자산총계:</span>
+            <span className="font-semibold ml-1">{data.totalAssets !== null && data.totalAssets !== undefined ? data.totalAssets.toLocaleString() : 'N/A'}억 원</span>
           </div>
           <div>
-            <span className="text-gray-600">총부채:</span>
-            <span className="font-semibold ml-1">{data.totalLiabilities.toLocaleString()}억 원</span>
+            <span className="text-gray-600">부채총계:</span>
+            <span className="font-semibold ml-1">{data.totalLiabilities !== null && data.totalLiabilities !== undefined ? data.totalLiabilities.toLocaleString() : 'N/A'}억 원</span>
           </div>
           <div>
-            <span className="text-gray-600">자기자본:</span>
-            <span className="font-semibold ml-1">{data.equity.toLocaleString()}억 원</span>
+            <span className="text-gray-600">자본총계:</span>
+            <span className="font-semibold ml-1">{data.equity !== null && data.equity !== undefined ? data.equity.toLocaleString() : 'N/A'}억 원</span>
           </div>
           <div>
             <span className="text-gray-600">매출액:</span>
-            <span className="font-semibold ml-1">{data.revenue.toLocaleString()}억 원</span>
+            <span className="font-semibold ml-1">{data.revenue !== null && data.revenue !== undefined ? data.revenue.toLocaleString() : 'N/A'}억 원</span>
+          </div>
+          <div>
+            <span className="text-gray-600">영업이익:</span>
+            <span className="font-semibold ml-1">{data.operatingIncome !== null && data.operatingIncome !== undefined ? data.operatingIncome.toLocaleString() : 'N/A'}억 원</span>
+          </div>
+          <div>
+            <span className="text-gray-600">당기순이익:</span>
+            <span className="font-semibold ml-1">{data.netIncome !== null && data.netIncome !== undefined ? data.netIncome.toLocaleString() : 'N/A'}억 원</span>
+          </div>
+          <div>
+            <span className="text-gray-600">영업현금흐름:</span>
+            <span className="font-semibold ml-1">{data.operatingCashFlow !== null && data.operatingCashFlow !== undefined ? data.operatingCashFlow.toLocaleString() : 'N/A'}억 원</span>
           </div>
         </div>
       </div>

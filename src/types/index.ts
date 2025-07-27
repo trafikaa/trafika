@@ -8,6 +8,7 @@ export interface CompanyData {
   currentAssets: number;
   currentLiabilities: number;
   revenue: number;
+  operatingIncome: number;
   netIncome: number;
   operatingCashFlow: number;
 }
