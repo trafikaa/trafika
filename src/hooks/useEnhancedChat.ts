@@ -80,11 +80,11 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
         const lastRatios = messages.slice().reverse().find(m => m.data && m.data.ratios)?.data?.ratios;
         if (lastRatios) {
           financialSummary += `\n[주요 재무비율]`;
-          financialSummary += `\n- 부채비율: ${lastRatios.debt_ratio ?? 'N/A'}%`;
-          financialSummary += `\n- 유동비율: ${lastRatios.current_ratio ?? 'N/A'}`;
-          financialSummary += `\n- 자기자본비율: ${lastRatios.equity_ratio ?? 'N/A'}%`;
-          financialSummary += `\n- ROA: ${lastRatios.ROA ?? 'N/A'}%`;
-          financialSummary += `\n- ROE: ${lastRatios.ROE ?? 'N/A'}%`;
+              financialSummary += `\n- 부채비율: ${lastRatios.debt_ratio ?? 'N/A'}%`;
+    financialSummary += `\n- 유동비율: ${lastRatios.current_ratio ?? 'N/A'}`;
+    financialSummary += `\n- 자기자본비율: ${lastRatios.equity_ratio ?? 'N/A'}%`;
+    financialSummary += `\n- 매출액 성장률: ${lastRatios.revenue_growth ?? 'N/A'}%`;
+    financialSummary += `\n- ROE: ${lastRatios.ROE ?? 'N/A'}%`;
           financialSummary += `\n- 영업이익률: ${lastRatios.operating_margin_on_total_assets ?? 'N/A'}%`;
         }
 

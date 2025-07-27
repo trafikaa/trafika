@@ -22,7 +22,7 @@ export interface FinancialRatios {
   debt_ratio: number | null;
   current_ratio: number | null;
   equity_ratio: number | null;
-  ROA: number | null; // ROA
+  revenue_growth: number | null; // 매출액 성장률
   ROE: number | null;
   operating_margin_on_total_assets: number | null; // 영업이익률
 }

@@ -88,11 +88,11 @@ const EnhancedChatMessage: React.FC<EnhancedChatMessageProps> = ({ message }) =>
           <div className="mt-2 p-3 bg-gray-50 rounded text-sm">
             <div className="font-medium mb-2">주요 재무비율</div>
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <div>부채비율: {message.data.ratios.debt_ratio?.toFixed(2) || 'N/A'}%</div>
-              <div>유동비율: {message.data.ratios.current_ratio?.toFixed(2) || 'N/A'}</div>
-              <div>자기자본비율: {message.data.ratios.equity_ratio?.toFixed(2) || 'N/A'}%</div>
-              <div>ROA: {message.data.ratios.ROA?.toFixed(2) || 'N/A'}%</div>
-              <div>ROE: {message.data.ratios.ROE?.toFixed(2) || 'N/A'}%</div>
+                          <div>부채비율: {message.data.ratios.debt_ratio?.toFixed(2) || 'N/A'}%</div>
+            <div>유동비율: {message.data.ratios.current_ratio?.toFixed(2) || 'N/A'}</div>
+            <div>자기자본비율: {message.data.ratios.equity_ratio?.toFixed(2) || 'N/A'}%</div>
+            <div>매출액 성장률: {message.data.ratios.revenue_growth?.toFixed(2) || 'N/A'}%</div>
+            <div>ROE: {message.data.ratios.ROE?.toFixed(2) || 'N/A'}%</div>
               <div>영업이익률: {message.data.ratios.operating_margin_on_total_assets?.toFixed(2) || 'N/A'}%</div>
             </div>
           </div>

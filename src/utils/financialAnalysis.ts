@@ -38,15 +38,15 @@ export const assessRisk = (ratios: FinancialRatios, data: CompanyData): RiskAsse
     recommendations.push('내부 유보 증대 및 자본 확충을 고려해보세요.');
   }
 
-  // ROA 평가 (음수 위험) - null 체크 추가
-  if (ratios.ROA !== null && ratios.ROA < 0) {
+  // 매출액 성장률 평가 (음수 위험)
+  if (ratios.revenue_growth !== null && ratios.revenue_growth < 0) {
     riskScore += 20;
-    warnings.push('총자산수익률(ROA)이 음수로 수익성이 매우 낮습니다.');
-    recommendations.push('수익성 개선을 위한 사업 구조조정이 필요합니다.');
-  } else if (ratios.ROA !== null && ratios.ROA < 3) {
+    warnings.push('매출액 성장률이 음수로 매출이 감소하고 있습니다.');
+    recommendations.push('매출 증대를 위한 사업 전략 수립이 필요합니다.');
+  } else if (ratios.revenue_growth !== null && ratios.revenue_growth < 5) {
     riskScore += 5;
-    warnings.push('총자산수익률(ROA)이 낮아 수익성 개선이 필요합니다.');
-    recommendations.push('자산 효율성 제고 및 수익성 개선 방안을 모색하세요.');
+    warnings.push('매출액 성장률이 낮아 성장성 개선이 필요합니다.');
+    recommendations.push('신규 사업 확장 및 매출 증대 방안을 모색하세요.');
   }
 
   // 영업현금흐름 평가
