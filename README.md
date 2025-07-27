@@ -68,7 +68,7 @@ npm run build
 
 | 비율 | 설명 | 우수 기준 | 양호 기준 |
 |------|------|-----------|-----------|
-| 부채비율 | 총부채 / 총자산 | 100% 이하 | 200% 이하 |
+| 부채비율 | 총부채 / 자기자본 | 100% 이하 | 200% 이하 |
 | 유동비율 | 유동자산 / 유동부채 | 150% 이상 | 100% 이상 |
 | 자기자본비율 | 자기자본 / 총자산 | 50% 이상 | 30% 이상 |
 | 매출액 성장률 | 전년 대비 매출액 증가율 | 10% 이상 | 0% 이상 |
@@ -82,11 +82,8 @@ trafika/
 ├── src/
 │   ├── components/          # React 컴포넌트
 │   │   ├── FinancialHealthReport.tsx  # 재무건전성 보고서
-│   │   ├── EnhancedChatMessage.tsx    # 향상된 채팅 메시지
-│   │   ├── ChatMessage.tsx            # 기본 채팅 메시지
-│   │   ├── TypingIndicator.tsx        # 타이핑 표시기
-│   │   ├── SplashScreen.tsx           # 스플래시 화면
-│   │   └── FearGreedIndex.tsx        # 공포/탐욕 지수 (주석처리됨)
+│   │   ├── EnhancedChatMessage.tsx    # 채팅 메시지
+│   │   └── ...
 │   ├── services/           # API 서비스
 │   │   ├── companyService.ts    # 기업 데이터 서비스
 │   │   ├── chatgptApi.ts       # ChatGPT API
