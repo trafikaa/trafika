@@ -40,7 +40,7 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
       title: '부채비율',
       value: ratios.debt_ratio,
       unit: '%',
-      description: '총부채 / 총자산',
+      description: '총부채 / 자기자본',
       health: getHealthScore(ratios.debt_ratio, { good: 100, fair: 200 }, false),
       icon: <Shield className="w-5 h-5" />,
       benchmark: '100% 이하 우수, 200% 이하 양호'
