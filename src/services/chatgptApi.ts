@@ -23,8 +23,8 @@ class ChatGPTApi {
     options: ChatGPTOptions = {}
   ): Promise<string> {
     const defaultOptions: ChatGPTOptions = {
-      // model: 'gpt-3.5-turbo',
-      model: 'gpt-4o-mini',
+      model: 'gpt-3.5-turbo',
+      // model: 'gpt-4o-mini',
       max_tokens: 1000,
       temperature: 0.7,
       ...options,
