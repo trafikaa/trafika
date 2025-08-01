@@ -140,6 +140,9 @@ ChatGPT API를 활용하여 다음과 같은 기능을 제공합니다:
 - **주의** (40-69점): 개선이 필요한 상태
 - **위험** (70점 이상): 즉시 개선이 필요한 상태
 
+### UI/UX 기획
+- https://www.figma.com/design/wJRN7w31hgDhTyJJcIewqz/ChatBot-smart--Community---Copy-?node-id=0-1&t=WN1TRkBRQSvEYUTA-1
+
 ## 환경변수 설정
 
 ### Netlify 배포 시
