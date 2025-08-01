@@ -1,21 +1,29 @@
 export interface CompanyData {
   name: string;
+  corp_code?: string;
+  ticker?: string;
   totalAssets: number;
   totalLiabilities: number;
   equity: number;
   currentAssets: number;
   currentLiabilities: number;
   revenue: number;
+  operatingIncome: number;
   netIncome: number;
   operatingCashFlow: number;
+}
+
+export interface CompanyInfo {
+  corp_code: string;
+  ticker: string;
 }
 
 export interface FinancialRatios {
   debt_ratio: number | null;
   current_ratio: number | null;
   equity_ratio: number | null;
-  pretax_income_to_total_assets: number | null; // ROA
-  roe: number | null;
+  revenue_growth: number | null; // 매출액 성장률
+  ROE: number | null;
   operating_margin_on_total_assets: number | null; // 영업이익률
 }
 
@@ -31,6 +39,7 @@ export interface ChatMessageData {
   riskLevel?: 'safe' | 'caution' | 'danger';
   riskScore?: number;
   companyData?: CompanyData;
+  companyInfo?: CompanyInfo;
 }
 
 export interface ChatMessage {
@@ -41,4 +50,4 @@ export interface ChatMessage {
   data?: ChatMessageData; 
 }
 
-export type ChatStep = 'welcome' | 'company-name' | 'financial-data' | 'analysis' | 'complete' | 'chat';
+export type ChatStep = 'welcome' | 'company-name' | 'analysis' | 'complete' | 'chat';

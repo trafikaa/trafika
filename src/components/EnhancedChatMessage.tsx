@@ -63,7 +63,7 @@ const EnhancedChatMessage: React.FC<EnhancedChatMessageProps> = ({ message }) =>
           {message.content}
         </div>
 
-        {/* Fear & Greed Index */}
+        {/* Fear & Greed Index
         {message.data?.riskScore !== undefined && message.data?.riskLevel && (
           <div className="mb-6">
             <FearGreedIndex 
@@ -71,14 +71,15 @@ const EnhancedChatMessage: React.FC<EnhancedChatMessageProps> = ({ message }) =>
               level={message.data.riskLevel} 
             />
           </div>
-        )}
+        )} */}
 
         {/* 재무건전성 보고서 */}
-        {message.data?.ratios && message.data?.companyData && (
+        {message.data?.ratios && message.data?.companyData && message.data?.companyInfo && (
           <div className="mb-4">
             <FinancialHealthReport 
               ratios={message.data.ratios}
               data={message.data.companyData}
+              companyInfo={message.data.companyInfo}
             />
           </div>
         )}
@@ -87,17 +88,17 @@ const EnhancedChatMessage: React.FC<EnhancedChatMessageProps> = ({ message }) =>
           <div className="mt-2 p-3 bg-gray-50 rounded text-sm">
             <div className="font-medium mb-2">주요 재무비율</div>
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <div>부채비율: {message.data.ratios.debt_ratio?.toFixed(2) || 'N/A'}%</div>
-              <div>유동비율: {message.data.ratios.current_ratio?.toFixed(2) || 'N/A'}</div>
-              <div>자기자본비율: {message.data.ratios.equity_ratio?.toFixed(2) || 'N/A'}%</div>
-              <div>ROA: {message.data.ratios.pretax_income_to_total_assets?.toFixed(2) || 'N/A'}%</div>
-              <div>ROE: {message.data.ratios.roe?.toFixed(2) || 'N/A'}%</div>
+                          <div>부채비율: {message.data.ratios.debt_ratio?.toFixed(2) || 'N/A'}%</div>
+            <div>유동비율: {message.data.ratios.current_ratio?.toFixed(2) || 'N/A'}</div>
+            <div>자기자본비율: {message.data.ratios.equity_ratio?.toFixed(2) || 'N/A'}%</div>
+            <div>매출액 성장률: {message.data.ratios.revenue_growth?.toFixed(2) || 'N/A'}%</div>
+            <div>ROE: {message.data.ratios.ROE?.toFixed(2) || 'N/A'}%</div>
               <div>영업이익률: {message.data.ratios.operating_margin_on_total_assets?.toFixed(2) || 'N/A'}%</div>
             </div>
           </div>
         )}
         
-        <div className="text-xs text-gray-500 mt-2">
+        <div className={`text-xs mt-2 ${isBot ? 'text-gray-500' : 'text-sky-400'}`}>
           {message.timestamp.toLocaleTimeString('ko-KR', { 
             hour: '2-digit', 
             minute: '2-digit' 

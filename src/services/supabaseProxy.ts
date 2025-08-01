@@ -20,6 +20,8 @@ export const supabaseProxy = {
     },
   
     async select(table: string, query?: any) {
+      console.log('Supabase 쿼리 요청:', { table, query });
+      
       const response = await fetch('/.netlify/functions/supabaseProxy', {
         method: 'POST',
         headers: {
@@ -33,10 +35,18 @@ export const supabaseProxy = {
       });
   
       if (!response.ok) {
-        throw new Error('데이터 조회 실패');
+        const errorText = await response.text();
+        console.error('Supabase 응답 오류:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorText
+        });
+        throw new Error(`데이터 조회 실패: ${response.status} ${response.statusText}`);
       }
   
-      return response.json();
+      const result = await response.json();
+      console.log('Supabase 쿼리 결과:', result);
+      return result;
     },
   
     async update(table: string, id: string, data: any) {

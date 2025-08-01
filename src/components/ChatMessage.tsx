@@ -65,15 +65,15 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
           <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
             <div className="font-medium mb-1">주요 재무비율</div>
             <div className="space-y-1">
-              <div>부채비율: {message.data.ratios.debt_ratio?.toFixed(2) || 'N/A'}%</div>
-              <div>유동비율: {message.data.ratios.current_ratio?.toFixed(2) || 'N/A'}</div>
-              <div>자기자본비율: {message.data.ratios.equity_ratio?.toFixed(2) || 'N/A'}%</div>
-              <div>ROA: {message.data.ratios.pretax_income_to_total_assets?.toFixed(2) || 'N/A'}%</div>
+                          <div>부채비율: {message.data.ratios.debt_ratio?.toFixed(2) || 'N/A'}%</div>
+            <div>유동비율: {message.data.ratios.current_ratio?.toFixed(2) || 'N/A'}</div>
+            <div>자기자본비율: {message.data.ratios.equity_ratio?.toFixed(2) || 'N/A'}%</div>
+            <div>매출액 성장률: {message.data.ratios.revenue_growth?.toFixed(2) || 'N/A'}%</div>
             </div>
           </div>
         )}
         
-        <div className="text-xs text-gray-500 mt-2">
+        <div className={`text-xs mt-2 ${isBot ? 'text-gray-500' : 'text-sky-400'}`}>
           {message.timestamp.toLocaleTimeString('ko-KR', { 
             hour: '2-digit', 
             minute: '2-digit' 

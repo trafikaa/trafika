@@ -1,11 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bot, TrendingDown, RefreshCw, Database } from 'lucide-react';
 import EnhancedChatMessage from './components/EnhancedChatMessage';
-import UnifiedFinancialForm from './components/UnifiedFinancialForm';
+// import UnifiedFinancialForm from './components/UnifiedFinancialForm';
 import TypingIndicator from './components/TypingIndicator';
+import SplashScreen from './components/SplashScreen';
 import { useEnhancedChat } from './hooks/useEnhancedChat';
+import { CompanyInfo } from './types';
 
 function App() {
+  const [showSplash, setShowSplash] = useState(true);
+  const [userInput, setUserInput] = useState('');
+  const [currentCompanyInfo, setCurrentCompanyInfo] = useState<CompanyInfo | null>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSplash(false), 1000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // 훅은 항상 최상단에서 호출!
   const {
     messages,
     currentStep,
@@ -14,12 +26,9 @@ function App() {
     isTyping,
     isLoading,
     handleCompanyNameSubmit,
-    handleFinancialDataSubmit,
     handleGeneralChat,
     resetChat,
-  } = useEnhancedChat();
-
-  const [userInput, setUserInput] = useState('');
+  } = useEnhancedChat(currentCompanyInfo);
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,6 +42,7 @@ function App() {
     }
   };
 
+  if (showSplash) return <SplashScreen />;
   return (
     <div className="min-h-screen bg-sky-500">
       {/* Header */}
@@ -97,16 +107,6 @@ function App() {
                   {isLoading ? '처리 중...' : '전송'}
                 </button>
               </form>
-            )}
-
-            {currentStep === 'financial-data' && (
-              <div className="flex justify-center">
-                <UnifiedFinancialForm 
-                  onSubmit={handleFinancialDataSubmit}
-                  companyName={companyName}
-                  initialData={companyData}
-                />
-              </div>
             )}
 
             {currentStep === 'complete' && (

@@ -5,8 +5,23 @@ let supabaseClient = null;
 
 function getSupabaseClient() {
   if (!supabaseClient) {
+    // 환경 변수에서 가져오거나 기본값 사용
     const supabaseUrl = process.env.VITE_SUPABASE_DATABASE_URL || process.env.SUPABASE_DATABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    
+    console.log('환경 변수 확인:', {
+      supabaseUrl: supabaseUrl ? '설정됨' : '설정되지 않음',
+      hasServiceKey: supabaseServiceKey ? '설정됨' : '설정되지 않음'
+    });
+    
+    if (!supabaseUrl) {
+      throw new Error('supabaseUrl is required. Please set VITE_SUPABASE_DATABASE_URL environment variable.');
+    }
+    
+    if (!supabaseServiceKey) {
+      throw new Error('supabaseServiceKey is required. Please set SUPABASE_SERVICE_ROLE_KEY environment variable.');
+    }
+    
     supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
   }
   return supabaseClient;
@@ -24,8 +39,18 @@ exports.handler = async function(event, context) {
   }
 
   try {
+    console.log('Supabase 프록시 시작');
+    console.log('모든 환경 변수 확인:', {
+      VITE_SUPABASE_DATABASE_URL: process.env.VITE_SUPABASE_DATABASE_URL,
+      SUPABASE_DATABASE_URL: process.env.SUPABASE_DATABASE_URL,
+      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY ? '설정됨' : '설정되지 않음',
+      NODE_ENV: process.env.NODE_ENV
+    });
+    
     const supabase = getSupabaseClient();
     const { action, table, data, query } = JSON.parse(event.body || '{}');
+    
+    console.log('요청 데이터:', { action, table, query });
 
     let result;
 
@@ -77,10 +102,12 @@ exports.handler = async function(event, context) {
         throw new Error('지원하지 않는 액션입니다.');
     }
 
+    console.log('쿼리 결과:', result);
     return { statusCode: 200, headers, body: JSON.stringify(result) };
 
   } catch (error) {
     console.error('Supabase 프록시 오류:', error);
+    console.error('오류 스택:', error.stack);
     return { statusCode: 500, headers, body: JSON.stringify({ error: error.message }) };
   }
 }; 

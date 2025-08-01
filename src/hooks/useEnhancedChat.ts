@@ -1,17 +1,17 @@
 import { useState, useCallback } from 'react';
 import { ChatMessage, ChatStep, CompanyData, FinancialRatios } from '../types';
 import { assessRisk } from '../utils/financialAnalysis';
-import { dartApi } from '../services/dartApi';
-// import { riskDatabase } from '../services/riskDatabase';
-import { getCompanyInfoByName, getFinancialRatiosByTicker, CompanyInfo } from '../services/companyService';
+// import { dartApi } from '../services/dartApi';
+//import { riskDatabase } from '../services/riskDatabase';
+import { getCompanyInfoByName, getFinancialRatiosByTicker, getFinancialDataByTicker, CompanyInfo } from '../services/companyService';
 import { chatgptApi } from '../services/chatgptApi';
 
-export const useEnhancedChat = () => {
+export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
       type: 'bot',
-      content: '안녕하세요! 고도화된 부실기업 경고 시스템입니다. 🏢\n\n기업명을 입력하시면 데이터베이스에서 기업 코드를 찾고, 다트(DART)에서 최신 재무정보를 자동으로 불러와 분석해드립니다.\n\n또한 재무 관련 질문이나 다른 궁금한 점이 있으시면 언제든지 물어보세요!',
+      content: '안녕하세요! 재무제표를 분석하는 혜서입니다. 🏢\n\n기업명을 입력하시면 다트(DART)에서 불러온 최신 재무정보를 분석해드립니다.\n\n또한 재무 관련 질문이나 다른 궁금한 점이 있으시면 언제든지 물어보세요!',
       timestamp: new Date(),
     }
   ]);
@@ -19,7 +19,7 @@ export const useEnhancedChat = () => {
   const [currentStep, setCurrentStep] = useState<ChatStep>('company-name');
   const [companyName, setCompanyName] = useState('');
   const [companyData, setCompanyData] = useState<CompanyData | null>(null);
-  const [currentCompanyInfo, setCurrentCompanyInfo] = useState<CompanyInfo | null>(null);
+  const [currentCompanyInfo, setCurrentCompanyInfo] = useState<CompanyInfo | null>(companyInfo || null);
   const [isTyping, setIsTyping] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -68,22 +68,23 @@ export const useEnhancedChat = () => {
           financialSummary += `\n\n[현재 기업: ${companyData.name}]`;
           financialSummary += `\n- 자산총계: ${companyData.totalAssets}`;
           financialSummary += `\n- 부채총계: ${companyData.totalLiabilities}`;
-          financialSummary += `\n- 자기자본: ${companyData.equity}`;
+          financialSummary += `\n- 자본총계: ${companyData.equity}`;
           financialSummary += `\n- 유동자산: ${companyData.currentAssets}`;
           financialSummary += `\n- 유동부채: ${companyData.currentLiabilities}`;
-          financialSummary += `\n- 매출: ${companyData.revenue}`;
-          financialSummary += `\n- 순이익: ${companyData.netIncome}`;
+          financialSummary += `\n- 매출액: ${companyData.revenue}`;
+          financialSummary += `\n- 영업이익: ${companyData.operatingIncome}`;
+          financialSummary += `\n- 당기순이익: ${companyData.netIncome}`;
           financialSummary += `\n- 영업현금흐름: ${companyData.operatingCashFlow}`;
         }
         // 가장 최근 메시지의 ratios를 찾아 요약
         const lastRatios = messages.slice().reverse().find(m => m.data && m.data.ratios)?.data?.ratios;
         if (lastRatios) {
           financialSummary += `\n[주요 재무비율]`;
-          financialSummary += `\n- 부채비율: ${lastRatios.debt_ratio ?? 'N/A'}%`;
-          financialSummary += `\n- 유동비율: ${lastRatios.current_ratio ?? 'N/A'}`;
-          financialSummary += `\n- 자기자본비율: ${lastRatios.equity_ratio ?? 'N/A'}%`;
-          financialSummary += `\n- ROA: ${lastRatios.pretax_income_to_total_assets ?? 'N/A'}%`;
-          financialSummary += `\n- ROE: ${lastRatios.roe ?? 'N/A'}%`;
+              financialSummary += `\n- 부채비율: ${lastRatios.debt_ratio ?? 'N/A'}%`;
+    financialSummary += `\n- 유동비율: ${lastRatios.current_ratio ?? 'N/A'}`;
+    financialSummary += `\n- 자기자본비율: ${lastRatios.equity_ratio ?? 'N/A'}%`;
+    financialSummary += `\n- 매출액 성장률: ${lastRatios.revenue_growth ?? 'N/A'}%`;
+    financialSummary += `\n- ROE: ${lastRatios.ROE ?? 'N/A'}%`;
           financialSummary += `\n- 영업이익률: ${lastRatios.operating_margin_on_total_assets ?? 'N/A'}%`;
         }
 
@@ -170,11 +171,11 @@ export const useEnhancedChat = () => {
         simulateTyping(async () => {
           addMessage({
             type: 'bot',
-            content: `${name}의 최신 재무정보를 다트(DART)에서 불러오는 중입니다... 📊`,
+            content: `${name}의 재무정보를 데이터베이스에서 불러오는 중입니다... 📊`,
           });
 
-          // corp_code를 사용하여 DART API에서 재무제표 데이터 가져오기
-          const financialData = await dartApi.getFinancialStatement(companyInfo.corp_code);
+          // Supabase에서 재무 데이터 가져오기
+          const financialData = await getFinancialDataByTicker(companyInfo.ticker);
           
           if (!financialData) {
             addMessage({
@@ -191,15 +192,50 @@ export const useEnhancedChat = () => {
           };
 
           setCompanyData(fullCompanyData);
-          setCurrentStep('financial-data');
+          setCurrentStep('complete');
 
-          simulateTyping(() => {
+          // 이 부분을 주석 해제하고 활성화해야 합니다:
+          try {
             addMessage({
               type: 'bot',
-              content: `✅ ${name}의 재무정보를 성공적으로 불러왔습니다!\n\n아래에서 데이터를 확인하고 필요시 수정한 후 분석을 진행해주세요.`,
+              content: `${name}의 재무비율 데이터를 데이터베이스에서 조회 중입니다... 📊`,
+            });
+
+            const ratios = await getFinancialRatiosByTicker(companyInfo.ticker);
+            
+            if (!ratios) {
+              addMessage({
+                type: 'bot',
+                content: `죄송합니다. "${name}" 기업의 재무비율 데이터를 찾을 수 없습니다.\n\n다른 기업명으로 다시 시도해주시거나, 재무 관련 질문을 자유롭게 해주세요.`,
+              });
+              setIsLoading(false);
+              return;
+            }
+
+            // 위험도 평가
+            const riskAssessment = assessRisk(ratios, fullCompanyData);
+            
+            addMessage({
+              type: 'bot',
+              content: `✅ ${name}의 재무정보를 성공적으로 불러왔습니다!\n\n분석 결과는 아래와 같습니다.`,
+              data: {
+                ratios,
+                riskLevel: riskAssessment.level,
+                riskScore: riskAssessment.score,
+                companyData: fullCompanyData,
+                companyInfo: companyInfo,
+              },
+            });
+            
+            setIsLoading(false);
+          } catch (error) {
+            console.error('분석 오류:', error);
+            addMessage({
+              type: 'bot',
+              content: `분석 중 오류가 발생했습니다: ${(error as Error).message}\n\n다시 시도해주세요.`,
             });
             setIsLoading(false);
-          }, 1000);
+          }
         }, 1500);
       } catch (error) {
         console.error('기업 정보 조회 오류:', error);
@@ -214,73 +250,13 @@ export const useEnhancedChat = () => {
     }, 1000);
   }, [addMessage, simulateTyping, handleGeneralChat]);
 
-  const handleFinancialDataSubmit = useCallback(async (data: CompanyData) => {
-    addMessage({
-      type: 'user',
-      content: `${data.name} 기업의 재무정보 분석을 시작합니다.`,
-    });
-
-    setCurrentStep('analysis');
-    setIsLoading(true);
-
-    simulateTyping(async () => {
-      try {
-        // 1. 저장된 ticker로 2024_ratio 테이블에서 재무비율 데이터 가져오기
-        if (!currentCompanyInfo) {
-          throw new Error('기업 정보가 없습니다.');
-        }
-
-        addMessage({
-          type: 'bot',
-          content: `${data.name}의 재무비율 데이터를 데이터베이스에서 조회 중입니다... 📊`,
-        });
-
-        const ratios = await getFinancialRatiosByTicker(currentCompanyInfo.ticker);
-        
-        if (!ratios) {
-          addMessage({
-            type: 'bot',
-            content: `죄송합니다. "${data.name}" 기업의 재무비율 데이터를 찾을 수 없습니다.\n\n다른 기업명으로 다시 시도해주시거나, 재무 관련 질문을 자유롭게 해주세요.`,
-          });
-          setIsLoading(false);
-          return;
-        }
-
-        // 2. 위험도 평가 (기존 로직 사용)
-        const riskAssessment = assessRisk(ratios, data);
-        
-        // 3. 데이터베이스 저장 부분 제거 - 분석 결과만 표시
-
-        addMessage({
-          type: 'bot',
-          content: '',
-          data: {
-            ratios,
-            riskLevel: riskAssessment.level,
-            riskScore: riskAssessment.score,
-            companyData: data,
-          },
-        });
-
-        setCurrentStep('complete');
-        setIsLoading(false);
-      } catch (error) {
-        console.error('분석 오류:', error);
-        addMessage({
-          type: 'bot',
-          content: `분석 중 오류가 발생했습니다: ${(error as Error).message}\n\n다시 시도해주세요.`,
-        });
-        setIsLoading(false);
-      }
-    }, 2000);
-  }, [addMessage, simulateTyping, currentCompanyInfo]);
 
   const resetChat = useCallback(() => {
     setMessages([
       {
         id: '1',
         type: 'bot',
-        content: '안녕하세요! 고도화된 부실기업 경고 시스템입니다. 🏢\n\n기업명을 입력하시면 데이터베이스에서 기업 코드를 찾고, 다트(DART)에서 최신 재무정보를 자동으로 불러와 분석해드립니다.\n\n또한 재무 관련 질문이나 다른 궁금한 점이 있으시면 언제든지 물어보세요!',
+        content: '안녕하세요! 재무제표를 분석하는 혜서입니다. 🏢\n\n기업명을 입력하시면 다트(DART)에서 불러온 최신 재무정보를 분석해드립니다.\n\n또한 재무 관련 질문이나 다른 궁금한 점이 있으시면 언제든지 물어보세요!',
         timestamp: new Date(),
       }
     ]);
@@ -300,7 +276,6 @@ export const useEnhancedChat = () => {
     isTyping,
     isLoading,
     handleCompanyNameSubmit,
-    handleFinancialDataSubmit,
     handleGeneralChat,
     resetChat,
   };
