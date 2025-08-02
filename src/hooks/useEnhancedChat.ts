@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { ChatMessage, ChatStep, CompanyData, FinancialRatios } from '../types';
+import { ChatMessage, ChatStep, CompanyData } from '../types';
 import { assessRisk } from '../utils/financialAnalysis';
 // import { dartApi } from '../services/dartApi';
 //import { riskDatabase } from '../services/riskDatabase';
@@ -19,7 +19,7 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
   const [currentStep, setCurrentStep] = useState<ChatStep>('company-name');
   const [companyName, setCompanyName] = useState('');
   const [companyData, setCompanyData] = useState<CompanyData | null>(null);
-  const [currentCompanyInfo, setCurrentCompanyInfo] = useState<CompanyInfo | null>(companyInfo || null);
+  const [, setCurrentCompanyInfo] = useState<CompanyInfo | null>(companyInfo || null);
   const [isTyping, setIsTyping] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -55,7 +55,7 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
         const financialKeywords = [
           '재무', '재무제표', '손익계산서', '재무상태표', '현금흐름표',
           '매출', '이익', '부채', '자산', '자본', '비율', '분석',
-          '삼성', 'LG', 'SK', '현대', '기업', '주식', '투자'
+          '기업', '주식', '투자'
         ];
 
         const isFinancialQuestion = financialKeywords.some(keyword => 
@@ -80,11 +80,11 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
         const lastRatios = messages.slice().reverse().find(m => m.data && m.data.ratios)?.data?.ratios;
         if (lastRatios) {
           financialSummary += `\n[주요 재무비율]`;
-              financialSummary += `\n- 부채비율: ${lastRatios.debt_ratio ?? 'N/A'}%`;
-    financialSummary += `\n- 유동비율: ${lastRatios.current_ratio ?? 'N/A'}`;
-    financialSummary += `\n- 자기자본비율: ${lastRatios.equity_ratio ?? 'N/A'}%`;
-    financialSummary += `\n- 매출액 성장률: ${lastRatios.revenue_growth ?? 'N/A'}%`;
-    financialSummary += `\n- ROE: ${lastRatios.ROE ?? 'N/A'}%`;
+          financialSummary += `\n- 부채비율: ${lastRatios.debt_ratio ?? 'N/A'}%`;
+          financialSummary += `\n- 유동비율: ${lastRatios.current_ratio ?? 'N/A'}`;
+          financialSummary += `\n- 자기자본비율: ${lastRatios.equity_ratio ?? 'N/A'}%`;
+          financialSummary += `\n- 매출액 성장률: ${lastRatios.revenue_growth ?? 'N/A'}%`;
+          financialSummary += `\n- ROE: ${lastRatios.ROE ?? 'N/A'}%`;
           financialSummary += `\n- 영업이익률: ${lastRatios.operating_margin_on_total_assets ?? 'N/A'}%`;
         }
 
@@ -189,7 +189,7 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
           const fullCompanyData: CompanyData = {
             name: name,
             ...financialData
-          };
+          } as CompanyData;
 
           setCompanyData(fullCompanyData);
           setCurrentStep('complete');

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bot, TrendingDown, RefreshCw, Database } from 'lucide-react';
+import { TrendingDown, RefreshCw, Database } from 'lucide-react';
 import EnhancedChatMessage from './components/EnhancedChatMessage';
 // import UnifiedFinancialForm from './components/UnifiedFinancialForm';
 import TypingIndicator from './components/TypingIndicator';
@@ -10,7 +10,7 @@ import { CompanyInfo } from './types';
 function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [userInput, setUserInput] = useState('');
-  const [currentCompanyInfo, setCurrentCompanyInfo] = useState<CompanyInfo | null>(null);
+  const [currentCompanyInfo] = useState<CompanyInfo | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 1000);
@@ -21,8 +21,6 @@ function App() {
   const {
     messages,
     currentStep,
-    companyName,
-    companyData,
     isTyping,
     isLoading,
     handleCompanyNameSubmit,

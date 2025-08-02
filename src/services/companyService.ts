@@ -1,7 +1,7 @@
 // 기업의 기본정보(대표자, 주소 등)를 조회하는 서비스
 
 import { supabaseProxy } from './supabaseProxy';
-import { FinancialRatios } from '../types';
+import { FinancialRatios, CompanyData } from '../types';
 
 export interface CompanyInfo {
   corp_code: string;
@@ -16,8 +16,8 @@ export async function getCompanyInfoByName(companyName: string): Promise<Company
     console.log('검색할 기업명:', normalizedInput);
     
     // 먼저 테이블 구조 확인을 위해 전체 데이터 조회
-    const allData = await supabaseProxy.select('ticker_info');
-    console.log('ticker_info 테이블 전체 데이터 (처음 5개):', allData.data?.slice(0, 5));
+    // const allData = await supabaseProxy.select('ticker_info');
+    // console.log('ticker_info 테이블 전체 데이터 (처음 5개):', allData.data?.slice(0, 5));
     
     // 정확한 매칭만 시도
     const result = await supabaseProxy.select('ticker_info', {
@@ -65,28 +65,28 @@ export async function getFinancialRatiosByTicker(ticker: string): Promise<Financ
 }
 
 // Supabase에서 재무 데이터를 가져오는 새로운 함수
-export async function getFinancialDataByTicker(ticker: string): Promise<any | null> {
+export async function getFinancialDataByTicker(ticker: string): Promise<Partial<CompanyData> | null> {
   try {
     // ticker는 정규화하지 않음
     
     // 2024년 데이터부터 순서대로 조회
-    let result = await supabaseProxy.select('financial_2024', {
+    const result = await supabaseProxy.select('financial_2024', {
       ticker: ticker
     });
 
-    if (!result.data || result.data.length === 0) {
-      // 2024년 데이터가 없으면 2023년 조회
-      result = await supabaseProxy.select('financial_2023', {
-        ticker: ticker
-      });
-    }
+    // if (!result.data || result.data.length === 0) {
+    //   // 2024년 데이터가 없으면 2023년 조회
+    //   result = await supabaseProxy.select('financial_2023', {
+    //     ticker: ticker
+    //   });
+    // }
 
-    if (!result.data || result.data.length === 0) {
-      // 2023년 데이터가 없으면 2022년 조회
-      result = await supabaseProxy.select('financial_2022', {
-        ticker: ticker
-      });
-    }
+    // if (!result.data || result.data.length === 0) {
+    //   // 2023년 데이터가 없으면 2022년 조회
+    //   result = await supabaseProxy.select('financial_2022', {
+    //     ticker: ticker
+    //   });
+    // }
 
     if (!result.data || result.data.length === 0) {
       console.warn('DB에 해당 ticker의 재무 데이터가 없습니다:', ticker);

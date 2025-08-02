@@ -1,5 +1,5 @@
 export const supabaseProxy = {
-    async insert(table: string, data: any) {
+    async insert(table: string, data: Record<string, unknown>) {
       const response = await fetch('/.netlify/functions/supabaseProxy', {
         method: 'POST',
         headers: {
@@ -19,7 +19,7 @@ export const supabaseProxy = {
       return response.json();
     },
   
-    async select(table: string, query?: any) {
+    async select(table: string, query?: Record<string, unknown>) {
       console.log('Supabase 쿼리 요청:', { table, query });
       
       const response = await fetch('/.netlify/functions/supabaseProxy', {
@@ -49,7 +49,7 @@ export const supabaseProxy = {
       return result;
     },
   
-    async update(table: string, id: string, data: any) {
+    async update(table: string, id: string, data: Record<string, unknown>) {
       const response = await fetch('/.netlify/functions/supabaseProxy', {
         method: 'POST',
         headers: {

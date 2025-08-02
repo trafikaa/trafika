@@ -1,6 +1,6 @@
 import React from 'react';
 import { FinancialRatios, CompanyData, CompanyInfo } from '../types';
-import { TrendingUp, TrendingDown, DollarSign, Shield, AlertTriangle, CheckCircle } from 'lucide-react';
+import { TrendingUp, DollarSign, Shield, AlertTriangle, CheckCircle } from 'lucide-react';
 // import FearGreedIndex from './FearGreedIndex';
 // import { fetchRiskSimilarity } from '../services/similarityApi';
 // import { useState } from 'react';
@@ -11,7 +11,7 @@ interface FinancialHealthReportProps {
   companyInfo: CompanyInfo;
 }
 
-const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, data, companyInfo }) => {
+const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, data }) => {
   const getHealthScore = (value: number | null, thresholds: { good: number; fair: number }, isHigherBetter: boolean = true) => {
     if (value === null) return { score: 'unknown', color: 'text-gray-600', bg: 'bg-gray-50' };
     
@@ -92,23 +92,7 @@ const FinancialHealthReport: React.FC<FinancialHealthReportProps> = ({ ratios, d
     }
   ];
 
-  const overallHealth = () => {
-    const scores = healthMetrics.map(metric => {
-      switch (metric.health.score) {
-        case 'good': return 3;
-        case 'fair': return 2;
-        case 'poor': return 1;
-        default: return 1;
-      }
-    });
-    const average = scores.reduce((a, b) => a + b, 0) / scores.length;
-    
-    if (average >= 2.5) return { level: 'good', text: '우수', color: 'text-green-600' };
-    if (average >= 2.0) return { level: 'fair', text: '양호', color: 'text-yellow-600' };
-    return { level: 'poor', text: '개선필요', color: 'text-red-600' };
-  };
 
-   // const overall = overallHealth();
 
   // 부실 위험도 지수 관련 코드 - 주석처리됨
   /*

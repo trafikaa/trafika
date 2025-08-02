@@ -1,7 +1,6 @@
 import React from 'react';
 import { ChatMessage as ChatMessageType } from '../types';
 import { AlertTriangle, CheckCircle, AlertCircle } from 'lucide-react';
-import FearGreedIndex from './FearGreedIndex';
 import FinancialHealthReport from './FinancialHealthReport';
 
 interface EnhancedChatMessageProps {
