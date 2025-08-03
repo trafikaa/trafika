@@ -50,7 +50,30 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_key
 OPENAI_API_KEY=your_openai_api_key
 ```
 
-### 4. 개발 서버 실행
+### 4. Google Tag Manager 설정
+GTM을 사용하여 방문자 분석을 하려면:
+
+1. [Google Tag Manager](https://tagmanager.google.com/)에서 새 계정 생성
+2. 컨테이너 생성 → 웹 컨테이너 선택
+3. GTM 컨테이너 ID (GTM-XXXXXXX) 복사
+4. `index.html`의 GTM ID를 실제 컨테이너 ID로 교체
+
+#### 현재 설정된 GTM ID:
+- **GTM-P83P385B** (이미 설정됨)
+
+#### GTM에서 설정할 태그들:
+1. **Google Analytics 4** 태그 추가
+2. **사용자 정의 이벤트** 태그 추가 (챗봇, 재무분석 등)
+3. **트리거** 설정 (페이지 뷰, 클릭 등)
+
+**추적되는 이벤트들:**
+- 페이지 방문 및 체류 시간
+- 챗봇 대화 시작/완료/중단
+- 기업 검색 및 재무 분석
+- 사용자 세그먼트 (신규/재방문/충성 사용자)
+- 전환 목표 달성률
+
+### 5. 개발 서버 실행
 ```bash
 # 일반 개발 서버
 npm run dev
@@ -59,7 +82,7 @@ npm run dev
 npx netlify dev
 ```
 
-### 5. 빌드
+### 6. 빌드
 ```bash
 npm run build
 ```

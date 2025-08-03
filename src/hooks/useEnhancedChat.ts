@@ -1,10 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { ChatMessage, ChatStep, CompanyData } from '../types';
 import { assessRisk } from '../utils/financialAnalysis';
 // import { dartApi } from '../services/dartApi';
 //import { riskDatabase } from '../services/riskDatabase';
 import { getCompanyInfoByName, getFinancialRatiosByTicker, getFinancialDataByTicker, CompanyInfo } from '../services/companyService';
 import { chatgptApi } from '../services/chatgptApi';
+import { trackChatEvent, trackFinancialAnalysis, trackConversion, CONVERSION_GOALS } from '../utils/analytics';
 
 export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -15,6 +16,12 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
       timestamp: new Date(),
     }
   ]);
+
+  // 챗봇 시작 시간 기록
+  useEffect(() => {
+    sessionStorage.setItem('chat_start_time', Date.now().toString());
+    trackChatEvent('start', { step: 'initial' });
+  }, []);
   
   const [currentStep, setCurrentStep] = useState<ChatStep>('company-name');
   const [companyName, setCompanyName] = useState('');
@@ -135,6 +142,12 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
   }, [messages, addMessage, simulateTyping, companyData]);
 
   const handleCompanyNameSubmit = useCallback(async (name: string) => {
+    // GA4 추적: 기업 검색
+    trackFinancialAnalysis('company_search', name, {
+      search_term: name,
+      step: 'company_name_input',
+    });
+    
     addMessage({
       type: 'user',
       content: name,
@@ -215,6 +228,15 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
             // 위험도 평가
             const riskAssessment = assessRisk(ratios, fullCompanyData);
             
+            // GA4 추적: 재무 분석 완료
+            trackFinancialAnalysis('analysis_complete', name, {
+              risk_level: riskAssessment.level,
+              risk_score: riskAssessment.score,
+              has_ratios: !!ratios,
+              has_company_data: !!fullCompanyData,
+            });
+            trackConversion(CONVERSION_GOALS.FINANCIAL_ANALYSIS, riskAssessment.score);
+            
             addMessage({
               type: 'bot',
               content: `✅ ${name}의 재무정보를 성공적으로 불러왔습니다!\n\n분석 결과는 아래와 같습니다.`,
@@ -252,6 +274,12 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
 
 
   const resetChat = useCallback(() => {
+    // GA4 추적: 챗봇 리셋
+    trackChatEvent('abandon', {
+      messages_count: messages.length,
+      final_step: currentStep,
+    });
+    
     setMessages([
       {
         id: '1',
@@ -266,7 +294,7 @@ export const useEnhancedChat = (companyInfo?: CompanyInfo | null) => {
     setCurrentCompanyInfo(null);
     setIsTyping(false);
     setIsLoading(false);
-  }, []);
+  }, [messages.length, currentStep]);
 
   return {
     messages,

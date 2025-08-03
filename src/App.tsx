@@ -5,16 +5,54 @@ import EnhancedChatMessage from './components/EnhancedChatMessage';
 import TypingIndicator from './components/TypingIndicator';
 import SplashScreen from './components/SplashScreen';
 import { useEnhancedChat } from './hooks/useEnhancedChat';
+import { useEngagementTracking } from './hooks/useEngagementTracking';
 import { CompanyInfo } from './types';
+import { 
+  trackPageView, 
+  trackUserSegment, 
+  trackConversion, 
+  trackChatEvent, 
+  trackFinancialAnalysis,
+  updateVisitCount,
+  CONVERSION_GOALS,
+  USER_SEGMENTS 
+} from './utils/analytics';
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [userInput, setUserInput] = useState('');
   const [currentCompanyInfo] = useState<CompanyInfo | null>(null);
 
+  // GA4 추적 훅들
+  const { trackScrollDepth } = useEngagementTracking();
+
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 1000);
     return () => clearTimeout(timer);
+  }, []);
+
+  // 페이지 로드 시 GA4 추적 초기화
+  useEffect(() => {
+    updateVisitCount();
+    trackPageView('부실기업 경고 챗봇', window.location.pathname);
+    
+    // 사용자 세그먼트 추적
+    const userAgent = navigator.userAgent;
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    
+    trackUserSegment(USER_SEGMENTS.MOBILE_USER, isMobile);
+    trackUserSegment(USER_SEGMENTS.DESKTOP_USER, !isMobile);
+    
+    // 스크롤 깊이 추적
+    const handleScroll = () => {
+      trackScrollDepth();
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   // 훅은 항상 최상단에서 호출!
@@ -31,9 +69,31 @@ function App() {
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (userInput.trim() && !isLoading) {
+      // GA4 추적: 챗봇 메시지 전송
+      trackChatEvent('message', {
+        message_length: userInput.trim().length,
+        step: currentStep,
+      });
+      
       if (currentStep === 'company-name') {
+        // 전환 목표: 기업 검색
+        trackConversion(CONVERSION_GOALS.COMPANY_SEARCH);
         handleCompanyNameSubmit(userInput.trim());
       } else {
+        // 재무 관련 키워드 확인
+        const financialKeywords = ['재무', '재무제표', '분석', '비율', '투자', '기업'];
+        const isFinancialQuestion = financialKeywords.some(keyword => 
+          userInput.includes(keyword)
+        );
+        
+        if (isFinancialQuestion) {
+          trackUserSegment(USER_SEGMENTS.FINANCIAL_INTERESTED, true);
+          trackFinancialAnalysis('general_question', undefined, {
+            question_type: 'financial_inquiry',
+            keywords_found: financialKeywords.filter(keyword => userInput.includes(keyword)),
+          });
+        }
+        
         handleGeneralChat(userInput.trim());
       }
       setUserInput('');
@@ -59,7 +119,14 @@ function App() {
               <div className="flex items-center gap-2">
                 <TrendingDown className="w-5 h-5 text-red-500" />
                 <button
-                  onClick={resetChat}
+                  onClick={() => {
+                    // GA4 추적: 챗봇 리셋
+                    trackChatEvent('abandon', {
+                      messages_count: messages.length,
+                      session_duration: Date.now() - (sessionStorage.getItem('chat_start_time') ? parseInt(sessionStorage.getItem('chat_start_time')!) : Date.now()),
+                    });
+                    resetChat();
+                  }}
                   disabled={isLoading}
                   className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
                   title="새로운 분석 시작"
